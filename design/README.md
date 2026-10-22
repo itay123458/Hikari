@@ -9,5 +9,5 @@ The script creates a new scene and exports the WebP poster and GLB model into
 `site/assets/`. It preserves existing scenes; use a clean file for release exports.
 Generated scene and render settings were verified in Blender 5.2.1 LTS.
 
-The hub initially downloads only the ~64 KB WebP. The ~1.5 MB GLB and pinned
+The hub initially downloads only the ~57 KB WebP. The ~1.5 MB GLB and pinned
 model-viewer library load only after the visitor chooses **Explore in 3D**.
