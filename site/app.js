@@ -1,7 +1,9 @@
 import './art.js';
+import './motion.js';
 const $ = selector => document.querySelector(selector);
 const labels = { overview: 'Overview', commands: 'Command library', setup: 'Server setup', privacy: 'Privacy & care' };
 let catalogue, category = 'All', pendingQuery = '', toastTimer;
+const categoryLabel = name => name.replaceAll('_', ' ');
 function route({ focus = false } = {}) {
   const view = Object.hasOwn(labels, location.hash.slice(1)) ? location.hash.slice(1) : 'overview';
   for (const section of document.querySelectorAll('[data-view]')) section.hidden = section.dataset.view !== view;
@@ -35,7 +37,7 @@ function renderCommands() {
   if (!results.length) { const empty = document.createElement('p'); empty.className = 'empty'; empty.textContent = 'No commands found. Try another word or choose All.'; container.append(empty); }
   for (const command of results) {
     const card = document.createElement('article'); card.className = 'command-card';
-    const tag = document.createElement('span'); tag.className = 'category'; tag.textContent = command.category;
+    const tag = document.createElement('span'); tag.className = 'category'; tag.textContent = categoryLabel(command.category);
     const title = document.createElement('h2'); title.textContent = command.name;
     const description = document.createElement('p'); description.textContent = command.description;
     const copyButton = document.createElement('button'); copyButton.dataset.copy = command.name; copyButton.setAttribute('aria-label', `Copy ${command.name}`);
@@ -43,6 +45,7 @@ function renderCommands() {
     card.append(tag, title, description, copyButton); container.append(card);
   }
   for (const filter of document.querySelectorAll('[data-filter]')) filter.setAttribute('aria-pressed', String(filter.dataset.filter === category));
+  document.dispatchEvent(new Event('hikari:results'));
 }
 $('#command-search').addEventListener('input', renderCommands);
 try {
@@ -52,8 +55,15 @@ try {
   for (const link of document.querySelectorAll('[data-link]')) { link.href = catalogue.links[link.dataset.link]; link.target = '_blank'; link.rel = 'noopener noreferrer'; }
   $('#command-count').textContent = catalogue.topLevelCount;
   for (const label of ['All', ...new Set(catalogue.commands.map(c => c.category))]) {
-    const button = document.createElement('button'); button.textContent = label; button.dataset.filter = label; button.setAttribute('aria-pressed', String(label === category));
+    const button = document.createElement('button'); button.textContent = categoryLabel(label); button.dataset.filter = label; button.setAttribute('aria-pressed', String(label === category));
     button.addEventListener('click', () => { category = label; renderCommands(); }); $('#filters').append(button);
   }
   renderCommands();
-} catch { $('#catalogue-error').hidden = false; notify('Command library unavailable. Please refresh or use /help in Discord.'); }
+} catch {
+  $('#catalogue-error').hidden = false;
+  $('#results-count').textContent = 'Command library unavailable';
+  notify('Command library unavailable. Please refresh or use /help in Discord.');
+} finally {
+  $('#catalogue-loader').hidden = true;
+  $('#command-results').setAttribute('aria-busy', 'false');
+}

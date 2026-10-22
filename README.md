@@ -197,7 +197,14 @@ the active command loader and copies only public names, descriptions, categories
 and links. No bot login or secrets are needed to build the hub.
 
 GitHub Actions deploys only `site/` to GitHub Pages on pushes to `main`.
-The hub uses a midnight violet theme throughout. The original Blender artwork
+The dashboard uses a dark plum canvas, white typography, soft pink actions,
+and lavender accents inspired by Hikari. The responsive layout includes a
+desktop navigation rail, mobile bottom navigation, a searchable command list,
+loading placeholders, and restrained entrance, route, and scroll transitions.
+All existing invite links, command filters, copy actions, guides, privacy
+information, and 3D controls remain available in the vanilla HTML/CSS/ESM site.
+
+The original Blender artwork
 includes a detailed moonlit sanctuary, astral lantern, and celestial grimoire,
 each with an eight-second animation. A small rendered preview plays in the hero;
 full 3D models load only when requested. Play/pause controls, reduced-motion

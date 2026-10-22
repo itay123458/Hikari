@@ -51,6 +51,7 @@ function closeModel() {
 }
 for(const button of document.querySelectorAll('[data-scene]'))button.addEventListener('click',()=>{
   selected=button.dataset.scene;closeModel();const scene=scenes[selected];
+  poster.classList.add('media-loading');
   poster.src=`assets/${scene.file}.webp`;poster.alt=scene.alt;$('#scene-caption').textContent=`${scene.title.toUpperCase()} · AN ORIGINAL BLENDER SCENE`;
   for(const card of document.querySelectorAll('[data-scene]'))card.setAttribute('aria-pressed',String(card===button));
   status.textContent=`${scene.title} selected. Choose Explore in 3D to load its animated model.`;
