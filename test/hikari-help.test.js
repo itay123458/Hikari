@@ -4,6 +4,7 @@ import { Collection } from 'discord.js';
 import { loadCommands, registerCommands } from '../src/handlers/loaders/commandLoader.js';
 import { createInitialHelpMenu } from '../src/commands/Core/help.js';
 import { createAllCommandsMenu, helpCategorySelectMenu } from '../src/handlers/help/helpSelectMenus.js';
+import { helpBugReportButton } from '../src/handlers/help/helpButtons.js';
 
 async function fixture() {
   const client = { user: { username: 'Hikari', displayAvatarURL: () => undefined } };
@@ -32,7 +33,12 @@ test('help navigation and every page describe the active commands rather than ar
   assert(options.some(option => option.value === 'Anime'));
   for (const category of ['Economy', 'Ticket', 'Tools', 'Fun', 'Leveling', 'Giveaway', 'Community', 'Birthday']) assert(!options.some(option => option.value === category), `${category} must not appear`);
   const initialText = JSON.stringify({ rows, embeds: initial.embeds.map(embed => embed.toJSON()) });
-  assert(!/youtu\.be|discord\.gg|codebymitch|TitanBot/.test(initialText));
+  assert(!/youtu\.be|discord\.gg|github\.com|codebymitch|TitanBot/.test(initialText));
+  let report;
+  await helpBugReportButton.execute({ reply: async body => { report = body; } }, client);
+  assert.deepEqual(report.components, []);
+  assert(JSON.stringify(report.embeds.map(embed => embed.toJSON())).includes('server owner or staff'));
+  assert(!JSON.stringify(report).includes('github.com'));
   let content = '';
   const first = await createAllCommandsMenu(1, client);
   for (let page = 1; page <= first.totalPages; page++) {

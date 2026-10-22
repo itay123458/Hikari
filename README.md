@@ -1,308 +1,178 @@
-# Hikari — Private Anime Bot
+# 🌸 Hikari
 
-## Silver Palace edition
+**A private anime companion for Silver Palace.**
 
-Anime discovery, private watchlists and episode notes, recommendations,
-consent-based comparisons, release schedules/follows, watch parties, reviews,
-polls, guessing games, character tournaments and anime hubs are available under
-`/anime`. Hikari registers 29 focused commands: anime, music, essential
-moderation, role menus, welcome configuration, logging, and member/server info.
-Economy, gambling, tickets, leveling, giveaways, and miscellaneous tools are
-retired from the active catalogue. See [the active commands](docs/COMMANDS.md).
+Hikari brings anime discovery, personal watchlists, airing schedules, watch
+parties, and community activities into one Discord bot. Its lavender theme,
+role menus, and focused command set are built around a private anime club.
 
-See [anime setup, command reference, privacy and provider limitations](docs/ANIME.md).
-For an isolated installation alongside other bots, see [Raspberry Pi deployment](docs/DEPLOYMENT-PI.md).
-Jikan needs no key; AnimeSchedule schedules require `ANIMESCHEDULE_TOKEN` and
-persistent PostgreSQL. Crunchyroll integration uses provider-listed official
-links; regional availability, languages and actual publication are unknown.
+This repository is private. Setup instructions are for maintainers with
+repository access. Members can use `/help` or `/anime help`, and contact the
+server owner or staff for support.
 
-## Legacy upstream reference
+## What Hikari does
 
-The remaining sections document the original TitanBot project, whose source
-modules are retained for compatibility and attribution. They describe features
-outside Hikari's active command set; use the Hikari links above for this bot.
+| Feature | What you can do |
+| --- | --- |
+| Discover anime | Search and filter titles, explore seasons, browse character and voice credits, and open provider-listed official streaming links |
+| Track your watching | Keep a private watchlist, record episode progress, rate shows, save episode notes, and view personal statistics |
+| Find your next show | Get suggestions based on recorded preferences/history, compare with consenting members, and pick from your own list |
+| Follow releases | Browse raw/sub/dub schedules, view mapped episode countdowns, and follow releases privately or for the club |
+| Watch together | Create watch parties with RSVP, opt-in private reminders, episode discussions, reviews, and anime hubs |
+| Play and vote | Run anime guessing games, character tournaments, and persistent club polls |
+| Keep conversations moving | Post optional, spoiler-free conversation starters at a configurable interval, without mass pings |
+| Run the palace | Use essential moderation, music controls, welcome settings, role menus, logging, and member/server tools |
 
-**TitanBot** is the upstream Discord.js v14 and PostgreSQL community bot.
+## Start here
 
-[![Support Server](https://img.shields.io/badge/-Support%20Server-%235865F2?logo=discord&logoColor=white&style=flat-square&logoWidth=20)](https://discord.gg/8kJBYhTGW9)
-[![Discord.js](https://img.shields.io/npm/v/discord.js?style=flat-square&labelColor=%23202225&color=%23202225&logo=npm&logoColor=white&logoWidth=20)](https://www.npmjs.com/package/discord.js)
-![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-%23336791?logo=postgresql&logoColor=white&style=flat-square&logoWidth=20)
-
-## Table of Contents
-
-- [Features Overview](#features-overview)
-- [Quick Setup](#quick-setup)
-- [Manual Installation Steps](#manual-installation-steps)
-- [Support Server](https://discord.gg/QnWNz2dKCE)
-- [Required Bot Intents](#bot-intents)
-- [Contributing](CONTRIBUTING.md)
-
-<a name="features-overview"></a>
-## Features Overview
-
-TitanBot offers a complete suite of tools for Discord server management and community engagement:
-
-<table>
-<tr>
-<td width="50%" valign="top">
-
-### Moderation & Administration
-- **Mass Actions** - Bulk ban/kick capabilities
-- **User Notes** - Keep detailed moderation records
-- **Case Management** - View and track all mod actions
-
-### Economy System
-- **Shop & Inventory** - Buy and manage items
-- **Gambling** - Risk it for rewards
-- **Pay System** - Transfer money between users
-
-### Fun & Entertainment
-- **Random Facts** - Learn something new
-- **Wanted Poster** - Create fun wanted images
-- **Text Reversal** - Reverse any text
-
-### Advanced Ticket System
-- **Claim & Priority** - Staff ticket management
-- **Ticket Limits** - Prevent spam
-- **Transcript System** - Save ticket history
-
-### Server Stats
-- **Member Counter** - Live member count channels
-- **Voice Counters** - Track voice stats
-- **Dynamic Updates** - Real-time channel updates
-
-### Reaction Roles
-- **Role Assignment** - Self-assignable roles
-- **Emoji Selection** - Reaction-based system
-- **Multi-role Support** - Multiple role options
-
-</td>
-<td width="50%" valign="top">
-
-### Leveling & XP System
-- **XP Tracking** - Automatic message-based XP
-- **Level Roles** - Auto-assign roles by level
-- **Custom Configuration** - Personalize leveling
-
-### Giveaways & Events
-- **Multiple Winners** - Support multi-winner giveaways
-- **Auto Picking** - Automatic winner selection
-- **Reroll System** - Pick new winners if needed
-
-### Birthday System
-- **Birthday Tracking** - Never miss a birthday
-- **Auto Announcements** - Celebrate automatically
-- **Timezone Support** - Accurate worldwide tracking
-
-### Utility Tools
-- **Report System** - Report issues to staff
-- **Todo Lists** - Personal task management
-- **First Message** - Jump to channel's first message
-
-### Welcome System
-- **Welcome Messages** - Greet new members
-- **Auto Roles** - Assign roles on join
-- **Custom Embeds** - Personalized messages
-  
-### Music
-- **24/7 Mode** - Play music 24/7
-- **Interative Button System** - Manage music through buttons
-- **Supports EVERY platform** - Supports spotify, deezer, youtube, apple music
-  
-</td>
-</tr>
-</table>
-
-<a name="quick-setup"></a>
-## Quick Setup (Recommended for non-coders)
-
-### Video Tutorial
-For a detailed step-by-step setup guide, watch our comprehensive video tutorial:
-[**TitanBot Setup Tutorial**](https://www.youtube.com/@TouchDisc)
-
-## Docker Deployment (Recommended)
-
-TitanBot is fully containerized for easy deployment.
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/codebymitch/TitanBot.git
-   cd TitanBot
-   ```
-
-2. **Configure environment variables:**
-   ```bash
-   cp .env.example .env
-   ```
-   Set at minimum `DISCORD_TOKEN`, `CLIENT_ID`, and `GUILD_ID`. Docker Compose also reads `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_DB` from `.env` (defaults: `titanbot` / `password` / `titanbot`).
-
-3. **Build and start the containers:**
-   ```bash
-   docker compose up -d --build
-   ```
-
-4. **Check status:**
-   ```bash
-   docker compose ps
-   curl http://localhost:3000/health
-   ```
-
-This starts the bot and PostgreSQL. The compose file sets `POSTGRES_SSL=false` and `AUTO_MIGRATE=true` for the bundled database. Music uses public Lavalink v4 nodes from `lavalink/nodes.json` by default.
-
-### Music
-
-Music uses [Lavalink v4](https://github.com/lavalink-devs/Lavalink) via [Riffy](https://github.com/riffy-rb/riffy), similar to [Musicify](https://github.com/codebymitch/Musicify).
-
-1. By default, the bot loads multiple public v4 SSL nodes from [`lavalink/nodes.json`](lavalink/nodes.json) (sourced from [lavalink.darrennathanael.com](https://lavalink.darrennathanael.com/SSL/Lavalink-SSL/)). Edit that file to add or remove nodes.
-2. To self-host Lavalink instead, run `docker compose --profile local-lavalink up -d` and set single-node env vars in `.env`:
-   ```env
-   LAVALINK_HOST=lavalink
-   LAVALINK_PORT=2333
-   LAVALINK_PASSWORD=youshallnotpass
-   LAVALINK_SECURE=false
-   ```
-   Remove or rename `lavalink/nodes.json` so the bot falls back to those env vars.
-3. Override nodes inline with `LAVALINK_NODES` (JSON array) or point at another file with `LAVALINK_NODES_FILE`.
-4. Use `/play <song>` from a voice channel, or `/join` to connect without playing. Prefix shortcuts: `join`, `np`, `leave`, `pause`, `resume`, `skip`, `stop`, `volume <0-100>`, or `music <subcommand>`. Use `/nowplaying` and `/queue` for status; `/music` for loop, shuffle, seek, and other controls.
-
-### Using GitHub Container Registry
-
-The bot is automatically published to GitHub Container Registry on every push to main.
-
-```bash
-docker pull ghcr.io/codebymitch/titanbot:main
+```text
+/anime help
+/anime discover search
+/anime list add
+/anime list show
+/anime alerts schedule
+/anime club party
+/anime club poll
+/anime games guess
 ```
 
-<a name="manual-installation-steps"></a>
-## Manual Installation Steps
+Use Discord's command picker for the required options. Anime actions use slash
+commands; supported general commands also work with the configured prefix.
 
-### Prerequisites
-- Node.js 20.10.0 or higher
-- PostgreSQL server (recommended) or memory storage fallback
-- Discord bot application with proper intents
+## The active command set
 
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/codebymitch/TitanBot.git
-   cd TitanBot
-   ```
+Hikari registers **29 top-level commands**. The complete anime suite sits under
+`/anime`, organized into `discover`, `list`, `alerts`, `club`, `games`, and `admin`.
 
-2. **Install Dependencies**
-   ```bash
-   npm install
-   ```
+| Purpose | Commands |
+| --- | --- |
+| Anime | `/anime` |
+| Help, configuration, and status | `/help`, `/commands`, `/configwizard`, `/ping`, `/stats` |
+| Music | `/play`, `/queue`, `/nowplaying`, `/music` |
+| Moderation | `/ban`, `/unban`, `/kick`, `/timeout`, `/untimeout`, `/purge`, `/warn`, `/warnings`, `/cases`, `/lock`, `/unlock` |
+| Roles, welcomes, and logs | `/reactroles`, `/logging`, `/welcome`, `/greet` |
+| Member and server tools | `/avatar`, `/userinfo`, `/serverinfo`, `/report` |
 
-3. **Configure Environment Variables**
-   ```bash
-   cp .env.example .env
-   ```
-   Edit `.env` with your configuration (only the following variables require configuration, leave remaining variables as default):
-   ```env
-   # Discord Bot Configuration
-   DISCORD_TOKEN=your_discord_bot_token_here
-   CLIENT_ID=your_discord_client_id_here
-   GUILD_ID=your_discord_guild_id_here
+Staff commands keep their permission checks. Economy, gambling, tickets,
+leveling, giveaways, and unrelated legacy tools are outside the active command
+set. Their existing stored data is preserved.
 
-   # PostgreSQL Configuration (Primary Database)
-   POSTGRES_URL=postgresql://postgres:yourpassword@localhost:5432/titanbot
-   POSTGRES_HOST=localhost
-   POSTGRES_PORT=5432
-   POSTGRES_DB=titanbot
-   POSTGRES_USER=postgres
-   POSTGRES_PASSWORD=yourpassword
-   ```
+See the [command catalogue](docs/COMMANDS.md) and
+[full anime guide](docs/ANIME.md) for behavior, options, and limitations.
 
-   Production note:
-   - `NODE_ENV=production`
-   - `LOG_LEVEL=warn` for a clean production console (critical issues + startup status)
-   - `LOG_LEVEL=info` if you want more detailed operational logs
-   - If your chosen `PORT` is already used, TitanBot automatically tries the next port(s)
+## Privacy and spoilers
 
-   Environment options reference:
-   - `NODE_ENV`: `development`, `production`, `test` (any non-`production` value is treated as non-production)
-   - `LOG_LEVEL`: `error`, `warn`, `info`, `http`, `verbose`, `debug`, `silly`
-   - Accepted aliases for `LOG_LEVEL` in this bot: `warns`, `warning`, `warnings` → `warn`
+- Watchlists, ratings, and episode notes are private by default.
+- Shared comparisons require both members' current consent in that server.
+- Reviews are explicit public contributions. Review text is revealed privately
+  after an episode-context/spoiler warning when needed.
+- Anime data can be exported or deleted with `/anime list export` and
+  `/anime list delete`.
+- Party reminder DMs require an affirmative RSVP. Inactivity reminder DMs are
+  optional and can be disabled.
+- Synopses are hidden by default. Discord spoiler labels and tags still matter:
+  ordinary discussion threads do not enforce access based on viewing progress.
 
-   Recommended production `.env` (easy mode + default mode):
-   ```env
-   NODE_ENV=production
-   LOG_LEVEL=warn
-   WEB_HOST=0.0.0.0
-   PORT=3000
-   PORT_RETRY_ATTEMPTS=5
-   ```
-   This gives clear startup/online status messages while keeping logs simple for non-technical operators.
-   If port `3000` is busy, the bot tries the next available ports automatically (up to `PORT_RETRY_ATTEMPTS`).
+## Private club roles
 
-### Multiple servers
+| Role | Purpose |
+| --- | --- |
+| Palace Member | Approved club access, chat/media, polls, threads, voice, streaming, and voice activities |
+| Event Host | Club access, event management, and announcement posting |
+| Palace Guardian | Club/staff access, warnings and timeouts, message/thread cleanup, case viewing, and voice moderation |
+| Interest and genre roles | Optional cosmetic labels; no membership or staff powers |
+| Palace Veteran | Manually awarded cosmetic recognition; no extra permissions |
 
-Slash commands are registered **globally** on startup (via `CLIENT_ID`), so the bot works in every server it is invited to. `GUILD_ID` stays in the tutorial `.env` for setup steps but is not used for command registration.
+New arrivals can read welcome and rules while awaiting approval. Staff rooms
+stay private, and feed/archive channels stay read-only. Membership approval and
+invitations remain owner/admin-controlled. Role menus refresh permission data
+and reject roles with staff powers.
 
-Notes:
-- Global slash commands may take up to about an hour to propagate on first deploy
-- Each server has **isolated** data: config, economy, tickets, leveling, dashboards, warnings, etc. (all keys are scoped as `guild:{guildId}:...`)
-- In the [Discord Developer Portal](https://discord.com/developers/applications), ensure your bot is not restricted to a single guild if you plan to invite it elsewhere
-- Generate an OAuth2 invite URL from the [Discord Developer Portal](https://discord.com/developers/applications) (OAuth2 → URL Generator, scopes: `bot` and `applications.commands`)
+See [server roles and channel permissions](docs/SERVER-ROLES.md) for the full model.
 
-4. **Setup PostgreSQL Database** (Optional but recommended)
-   ```bash
-   # Create database and user
-   createdb titanbot
-   createuser titanbot
-   psql -c "ALTER USER titanbot PASSWORD 'yourpassword';"
-   psql -c "GRANT ALL PRIVILEGES ON DATABASE titanbot TO titanbot;"
-   ```
+## Conversation starters
 
-5. **Verify Database Setup**
-   ```bash
-   npm run migrate:check
-   ```
+Silver Palace uses a **two-day interval** in anime-chat. Prompts are original,
+spoiler-free questions with no mass pings or automatic DMs. They use the server's
+time zone and an evening window of **18:30–21:30**, subject to quiet hours.
+The default time zone is `Asia/Jerusalem`.
 
-6. **Start the Bot**
-   ```bash
-   npm start
-   ```
+Administrators can configure this with:
 
-> **Note on database migrations:** Schema tables and legacy key migrations run
-> **automatically on startup**, so` managed hosts like **Railway** need no manual
-> migration step — just deploy/restart. To disable auto-migration set
-> `AUTO_MIGRATE=false`. You can still run a manual key migration locally with
-> `node scripts/migrate-keys.js --dry-run` (preview) or `node scripts/migrate-keys.js`.
-<a name="bot-intents"></a>
+```text
+/anime admin channels conversation:#anime-chat
+/anime admin feeds prompt-days:2
+```
 
-## Required Bot Intents
-TitanBot requires the following Discord intents:
-- **Guilds**
-- **Guild Messages**
-- **Message Content**
-- **Guild Members**
-- **Guild Message Reactions**
-- **Guild Voice States**
-- **Direct Messages**
-- **Bot**
-- **Applications.commands**
+Set `prompt-days:0` to disable. The feature defaults off for an unconfigured
+server. Reservations and delivery receipts persist in PostgreSQL; expired-day
+jobs are skipped rather than posted in a catch-up burst after downtime.
 
-### Required Permissions
-- **View Channels**
-- **Send Messages**
-- **Embed Links**
-- **Attach Files**
-- **Read Message History**
-- **Manage Messages**
-- **Manage Channels**
-- **Manage Roles**
-- **Kick Members**
-- **Manage Messages**
-- **Ban Members**
-- **Moderate Members**
-- **Connect**
+## Maintainer setup
 
-## License
+Requirements: **Node.js 20.10+**, PostgreSQL, and a Discord bot application.
+Music additionally needs a working Lavalink v4 node. Enable **Server Members**
+and **Message Content** privileged intents for the current bot configuration.
 
-TitanBot is released under the MIT License. See [LICENSE](LICENSE) for details.
+From an authorized checkout:
 
-## Thank You
+```sh
+npm ci
+cp .env.example .env
+```
 
-Thank you for choosing TitanBot for your Discord server! We're constantly working to improve and add new features based on community feedback.
+Fill `.env` privately. At minimum, configure:
 
-*Last updated: May 2026*
+| Setting | Purpose |
+| --- | --- |
+| `DISCORD_TOKEN` | Hikari's Discord bot token |
+| `CLIENT_ID` | The same Discord application's ID |
+| `OWNER_IDS` | Comma-separated Discord IDs for bot owners |
+| `POSTGRES_URL` | The persistent PostgreSQL connection string |
+| `ANIMESCHEDULE_TOKEN` | AnimeSchedule application bearer token for schedules |
+| `PORT` | Health/API listening port |
+
+Keep `.env` and database backups out of Git. Before changing an existing
+installation, back up its database. Then validate the schema and start:
+
+```sh
+npm run migrate
+npm run migrate:check
+npm start
+```
+
+Use `/configwizard` for server setup and `/anime admin` to select channels,
+modules, title language, time zone, spoiler behavior, and optional feeds.
+
+For the isolated Docker deployment, use the
+[Raspberry Pi deployment guide](docs/DEPLOYMENT-PI.md). The `/health` and `/ready`
+endpoints report service and persistent-database readiness.
+
+## Data sources and availability
+
+**Jikan v4** supplies MyAnimeList metadata and needs no API key.
+**AnimeSchedule** supplies release schedules and needs an application token.
+Provider availability and rate limits can affect features.
+
+Crunchyroll integration opens provider-listed official links. Hikari does not
+sign into Crunchyroll, confirm regional availability/languages, or guarantee
+that an episode has been published. Music availability depends on Lavalink
+and the selected audio source.
+
+## Development checks
+
+```sh
+npm run check
+npm test
+```
+
+Tests cover private anime workflows, spoiler controls, persistent scheduling,
+duplicate-delivery protection, role-menu safety, and the active command/help
+catalogue. An additional concurrency check can use a disposable PostgreSQL
+instance through `TEST_POSTGRES_URL`.
+
+## Credits
+
+Hikari builds on TitanBot by **codebymitch**. Original copyright notices and
+the [MIT license](LICENSE) are retained. Repository visibility does not change
+those upstream license notices.

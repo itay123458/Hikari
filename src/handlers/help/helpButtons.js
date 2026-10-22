@@ -1,7 +1,7 @@
 import { createEmbed } from '../../utils/embeds.js';
 import { createAllCommandsMenu } from './helpSelectMenus.js';
 import { createInitialHelpMenu } from '../../commands/Core/help.js';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags } from 'discord.js';
+import { MessageFlags } from 'discord.js';
 import { logger } from '../../utils/logger.js';
 
 const BACK_BUTTON_ID = "help-back-to-main";
@@ -40,33 +40,26 @@ export const helpBackButton = {
 export const helpBugReportButton = {
     name: BUG_REPORT_BUTTON_ID,
     async execute(interaction, client) {
-        const githubButton = new ButtonBuilder()
-            .setLabel('🐛 Report Bug on GitHub')
-            .setStyle(ButtonStyle.Link)
-            .setURL('https://github.com/itay123458/Hikari/issues');
-
-        const bugRow = new ActionRowBuilder().addComponents(githubButton);
-
         const bugReportEmbed = createEmbed({
-            title: '🐛 Bug Report',
-            description: 'Found a bug? Please report it on our GitHub Issues page!\n\n' +
+            title: 'Report a Hikari issue',
+            description: 'Contact the server owner or staff if something is not working.\n\n' +
                 '**When reporting a bug, please include:**\n' +
-                '• 📝 Detailed description of the issue\n' +
-                '• 📋 Steps to reproduce the problem\n' +
-                '• 📸 Screenshots if applicable\n' +
-                '• 💻 Your bot version and environment\n\n' +
-                'This helps us fix issues faster and more effectively!',
-            color: 'error'
+                '• The command or button you used\n' +
+                '• What you expected and what happened\n' +
+                '• Steps to reproduce the issue\n' +
+                '• A screenshot if it helps\n\n' +
+                'Do not include tokens, passwords, or private watchlist/episode-note content.',
+            color: 'primary'
         });
         bugReportEmbed.setFooter({
             text: 'Hikari Bug Reports',
-            iconURL: client.user.displayAvatarURL()
+            iconURL: client.user?.displayAvatarURL?.()
         });
         bugReportEmbed.setTimestamp();
 
         await interaction.reply({
             embeds: [bugReportEmbed],
-            components: [bugRow],
+            components: [],
             flags: MessageFlags.Ephemeral
         });
     },

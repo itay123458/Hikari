@@ -92,11 +92,6 @@ export async function createInitialHelpMenu(client) {
                 ].join('\n'),
                 inline: false,
             },
-            {
-                name: '\u200B',
-                value: `[Hikari source](https://github.com/itay123458/Hikari)`,
-                inline: false,
-            },
         ],
     });
 
@@ -108,12 +103,7 @@ export async function createInitialHelpMenu(client) {
     const bugReportButton = new ButtonBuilder()
         .setCustomId(BUG_REPORT_BUTTON_ID)
         .setLabel("Report Bug")
-        .setStyle(ButtonStyle.Danger);
-
-    const supportButton = new ButtonBuilder()
-        .setLabel("Hikari Source")
-        .setURL("https://github.com/itay123458/Hikari")
-        .setStyle(ButtonStyle.Link);
+        .setStyle(ButtonStyle.Secondary);
 
     const selectRow = createSelectMenu(
         CATEGORY_SELECT_ID,
@@ -123,7 +113,6 @@ export async function createInitialHelpMenu(client) {
 
     const buttonRow = new ActionRowBuilder().addComponents([
         bugReportButton,
-        supportButton,
     ]);
 
     return {
