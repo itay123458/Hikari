@@ -3,6 +3,7 @@
  */
 
 export const CATEGORY_ICONS = {
+  Anime: '🎬',
   Birthday: '🎂',
   Community: '👥',
   Core: 'ℹ️',

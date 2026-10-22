@@ -116,7 +116,7 @@ const wipedataConfirmHandler = {
       const successMessage =
         `✅ **Your data has been successfully wiped!**\n\n` +
         `**Records Deleted:** ${deletedCount}\n\n` +
-        `Your account has been reset to default values. You can now start fresh!\n\n` +
+        `Your server account has been reset to default values. Global anime data uses the separate \`/anime list delete\` control.\n\n` +
         `*All your economy balance, levels, items, and personal data have been removed.*`;
 
       await interaction.editReply({

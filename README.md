@@ -1,5 +1,18 @@
 # TitanBot - Ultimate Discord Bot
 
+## Hikari anime extension
+
+Anime discovery, private watchlists and episode notes, recommendations,
+consent-based comparisons, release schedules/follows, watch parties, reviews,
+polls, guessing games, character tournaments and anime hubs are available under
+`/anime`. Existing bot features and deployment remain in place.
+
+See [anime setup, command reference, privacy and provider limitations](docs/ANIME.md).
+For an isolated installation alongside other bots, see [Raspberry Pi deployment](docs/DEPLOYMENT-PI.md).
+Jikan needs no key; AnimeSchedule schedules require `ANIMESCHEDULE_TOKEN` and
+persistent PostgreSQL. Crunchyroll integration uses provider-listed official
+links; regional availability, languages and actual publication are unknown.
+
 **TitanBot** is a powerful, feature-rich Discord bot designed to enhance your server experience with comprehensive moderation tools, engaging economy systems, utility features, and much more. Built with modern Discord.js v14 and PostgreSQL for optimal performance and data persistence.
 
 [![Support Server](https://img.shields.io/badge/-Support%20Server-%235865F2?logo=discord&logoColor=white&style=flat-square&logoWidth=20)](https://discord.gg/8kJBYhTGW9)

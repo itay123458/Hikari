@@ -1,0 +1,10 @@
+# Use together with docker-compose.yml; isolates Hikari from other Pi bots.
+name: hikari
+
+services:
+  bot:
+    container_name: hikari-bot
+  db:
+    container_name: hikari-db
+  lavalink:
+    container_name: hikari-lavalink

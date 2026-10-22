@@ -6,6 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { AsyncLocalStorage } from 'async_hooks';
 import crypto from 'crypto';
+import { redactSecrets } from './redactSecrets.js';
 
 const traceStorage = new AsyncLocalStorage();
 
@@ -161,6 +162,7 @@ const logger = createLogger({
     enforceLogSchema(),
     timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     errors({ stack: true }),
+    format(info => redactSecrets(info))(),
     format.json()
   ),
   defaultMeta: { service: 'titan-bot' },

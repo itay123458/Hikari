@@ -35,6 +35,7 @@ jobs:
       POSTGRES_USER: titanbot
       POSTGRES_PASSWORD: titanbot
       POSTGRES_SSL: "false"
+      TEST_POSTGRES_URL: postgresql://titanbot:titanbot@localhost:5432/titanbot
       SCHEMA_VERSION: "1"
       SCHEMA_VERSION_LABEL: "baseline-v1"
 
@@ -56,3 +57,9 @@ jobs:
 
       - name: Validate migration version
         run: npm run migrate:check
+
+      - name: Check JavaScript syntax
+        run: npm run check
+
+      - name: Run bot regression and anime tests
+        run: npm test

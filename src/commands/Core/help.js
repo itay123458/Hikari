@@ -22,6 +22,7 @@ const BUG_REPORT_BUTTON_ID = "help-bug-report";
 const HELP_MENU_TIMEOUT_MS = 5 * 60 * 1000;
 
 const CATEGORY_ICONS = {
+    Anime: "🎬",
     Core: "ℹ️",
     Moderation: "🛡️",
     Economy: "💰",
@@ -78,7 +79,7 @@ export async function createInitialHelpMenu(client) {
     const botName = client?.user?.username || "Bot";
     const embed = createEmbed({
         title: `📖 ${botName} Help`,
-        description: 'Set up your server, pick what to enable, then browse commands below.',
+        description: 'Set up your server, pick what to enable, then browse commands below. Use `/anime help` for anime discovery, private tracking and watch parties.',
         color: 'primary',
         thumbnail: client.user?.displayAvatarURL?.({ size: 1024 }),
         fields: [

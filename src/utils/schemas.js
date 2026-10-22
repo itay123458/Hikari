@@ -1,6 +1,7 @@
 // schemas.js
 
 import { z } from 'zod';
+import { AnimeSettingsSchema } from '../services/anime/domain.js';
 import { createError, ErrorTypes } from './errorHandler.js';
 
 export const LogIgnoreSchema = z
@@ -73,6 +74,7 @@ export const GuildConfigSchema = z
     logIgnore: LogIgnoreSchema.optional(),
     disabledCommands: z.record(z.boolean()).optional(),
     disabledCategories: z.record(z.boolean()).optional(),
+    anime: AnimeSettingsSchema.default({}),
     logging: LoggingConfigSchema.optional(),
     ticketLogging: TicketLoggingSchema.optional(),
     enableLogging: z.boolean().optional(),

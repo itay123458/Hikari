@@ -1,5 +1,6 @@
 import { BotConfig, getCommandPrefix } from '../bot.js';
 import { DEFAULT_GUILD_CONFIG } from '../../utils/constants.js';
+import { validateSettings } from '../../services/anime/domain.js';
 
 /**
  * Single source of truth for guild config default values.
@@ -12,4 +13,5 @@ export const GUILD_CONFIG_DEFAULTS = {
     dmOnClose: true,
     disabledCommands: {},
     disabledCategories: {},
+    anime: validateSettings({}),
 };

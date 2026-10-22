@@ -7,10 +7,12 @@
  */
 
 import { pgConfig } from '../../config/database/postgres.js';
+import { animeTableStatements } from '../../services/anime/schema.js';
 
 const t = pgConfig.tables;
 
 export const tableStatements = [
+    ...animeTableStatements,
     `CREATE TABLE IF NOT EXISTS ${t.guilds} (
         id VARCHAR(20) PRIMARY KEY,
         config JSONB DEFAULT '{}',

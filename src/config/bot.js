@@ -448,6 +448,7 @@ export const botConfig = {
   // =========================
   // Set any feature to `false` to disable it globally.
   features: {
+    anime: true,
     // Core systems.
     economy: true,
     leveling: true,
@@ -530,6 +531,7 @@ if (configErrors.length > 0) {
 export const BotConfig = botConfig;
 
 const COMMAND_CATEGORY_FEATURE_MAP = {
+  anime: "anime",
   birthday: "birthday",
   community: "community",
   economy: "economy",

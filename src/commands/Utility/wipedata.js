@@ -23,7 +23,10 @@ export default {
             `• 📋 All other personal data\n\n` +
             `**This cannot be undone. Are you absolutely sure?**`;
 
-        const embed = warningEmbed('Wipe All Data', warningMessage);
+        // Anime profiles are global; this legacy wipe remains scoped to a server.
+        const animeNotice = '\n\nGlobal anime profiles use a separate control: `/anime list delete` removes your anime data across all servers.';
+
+        const embed = warningEmbed('Wipe All Data', warningMessage + animeNotice);
 
         const confirmButtons = getConfirmationButtons('wipedata');
 

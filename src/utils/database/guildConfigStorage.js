@@ -23,11 +23,13 @@ export function unwrapReplitData(data) {
 export async function readGuildConfig(client, guildId, context = {}) {
     try {
         if (!client?.db || typeof client.db.get !== 'function') {
+            if (context.failClosed) throw new Error('Server configuration is unavailable.');
             logger.warn(`Database unavailable for readGuildConfig in guild ${guildId}`);
             return normalizeGuildConfig({}, GUILD_CONFIG_DEFAULTS);
         }
 
         if (typeof client.db.isAvailable === 'function' && !client.db.isAvailable()) {
+            if (context.failClosed) throw new Error('Persistent server configuration is unavailable.');
             logger.warn(`PostgreSQL unavailable for readGuildConfig in guild ${guildId}`, {
                 traceId: context.traceId,
                 guildId,
@@ -44,6 +46,7 @@ export async function readGuildConfig(client, guildId, context = {}) {
         const cleanedConfig = unwrapReplitData(rawConfig);
         return normalizeGuildConfig(cleanedConfig, GUILD_CONFIG_DEFAULTS);
     } catch (error) {
+        if (context.failClosed) throw error;
         logger.error(`Error fetching config for guild ${guildId}`, {
             error,
             traceId: context.traceId,

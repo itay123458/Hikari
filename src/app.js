@@ -17,6 +17,8 @@ import { initializeMusic } from './services/music/riffySetup.js';
 import { shutdownMusic } from './services/music/playerHandler.js';
 import pkg from '../package.json' with { type: 'json' };
 import { EXPECTED_SCHEMA_VERSION, EXPECTED_SCHEMA_LABEL } from './config/database/schemaVersion.js';
+import { contextFor } from './services/anime/context.js';
+import { AnimeWorker } from './services/anime/worker.js';
 
 class TitanBot extends Client {
   constructor() {
@@ -248,6 +250,13 @@ class TitanBot extends Client {
   }
 
   setupCronJobs() {
+    const anime = contextFor(this);
+    if (anime.store) {
+      this.animeWorker = new AnimeWorker(this, anime);
+      this.animeWorker.start();
+    } else {
+      logger.warn('Anime persistent features and scheduled notifications are disabled until PostgreSQL is available.');
+    }
     cron.schedule('0 6 * * *', runSafeTask('birthday_check', () => checkBirthdays(this)));
     cron.schedule('* * * * *', runSafeTask('giveaway_check', () => checkGiveaways(this)));
     cron.schedule('*/15 * * * *', runSafeTask('counter_update', () => this.updateAllCounters()));
@@ -341,6 +350,8 @@ class TitanBot extends Client {
       logger.info('Stopping cron jobs...');
       cron.getTasks().forEach(task => task.stop());
       logger.info('✅ Cron jobs stopped');
+
+      await this.animeWorker?.stop();
 
       logger.info('Stopping music players...');
       await shutdownMusic(this);
