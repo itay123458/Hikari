@@ -1,14 +1,8 @@
 import { createEmbed } from '../../utils/embeds.js';
 import { createButton, getPaginationRow } from '../../utils/components.js';
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { Collection, ActionRowBuilder, MessageFlags } from 'discord.js';
 import { logger } from '../../utils/logger.js';
 import { handleInteractionError } from '../../utils/errorHandler.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const BACK_BUTTON_ID = "help-back-to-main";
 const ALL_COMMANDS_ID = "help-all-commands";
@@ -19,6 +13,7 @@ const SUBCOMMAND_TYPE = 1;
 const SUBCOMMAND_GROUP_TYPE = 2;
 
 const CATEGORY_ICONS = {
+    Anime: '🌸',
     Core: "ℹ️",
     Moderation: "🛡️",
     Economy: "💰",
@@ -126,33 +121,10 @@ async function createCategoryCommandsMenu(category, client) {
 
     const categoryCommands = [];
 
-    try {
-        const categoryPath = path.join(__dirname, "../../commands", category);
-        const commandFiles = (await fs.readdir(categoryPath))
-            .filter((file) => file.endsWith(".js"))
-            .sort();
-
-        for (const file of commandFiles) {
-            const filePath = path.join(categoryPath, file);
-            const commandModule = await import(`file://${filePath}`);
-            const command = commandModule.default;
-            const commandData = normalizeCommandData(command);
-
-            if (commandData) {
-                if (
-                    commandData.name === "help" ||
-                    commandData.name === "commandlist"
-                )
-                    continue;
-
-                categoryCommands.push(...buildHelpEntries(command, categoryName));
-            }
+    for (const command of client.commands.values()) {
+        if ((command.category || 'Core') === category && command.data.name !== 'help') {
+            categoryCommands.push(...buildHelpEntries(command, categoryName));
         }
-    } catch (error) {
-        logger.error(
-            `Error reading commands from category ${category}:`,
-            error,
-        );
     }
 
     categoryCommands.sort((a, b) => a.displayName.localeCompare(b.displayName));
@@ -177,13 +149,16 @@ async function createCategoryCommandsMenu(category, client) {
     });
 
     if (categoryCommands.length > 0) {
+        // Large suites such as /anime use compact entries to stay under Discord's
+        // 6,000-character embed limit; descriptions remain in the slash picker.
+        const showDescriptions = categoryCommands.length <= 25;
         const commandMentions = categoryCommands
             .map((cmd) => {
                 const registeredCmd = registeredCommands.get(cmd.baseName);
                 if (registeredCmd && registeredCmd.id) {
-                    return `</${cmd.displayName}:${registeredCmd.id}> · ${cmd.description}`;
+                    return `</${cmd.displayName}:${registeredCmd.id}>${showDescriptions ? ` · ${cmd.description}` : ''}`;
                 }
-                return `\`/${cmd.displayName}\` · ${cmd.description}`;
+                return `\`/${cmd.displayName}\`${showDescriptions ? ` · ${cmd.description}` : ''}`;
             })
             .join("\n");
 
@@ -239,51 +214,12 @@ async function createCategoryCommandsMenu(category, client) {
 }
 
 export async function createAllCommandsMenu(page = 1, client) {
-    const commandsPerPage = 45;
+    const commandsPerPage = 18;
     const allCommands = [];
 
-    const commandsPath = path.join(__dirname, "../../commands");
-    const categoryDirs = (
-        await fs.readdir(commandsPath, { withFileTypes: true })
-    )
-        .filter((dirent) => dirent.isDirectory())
-        .map((dirent) => dirent.name)
-        .sort();
-
-    for (const category of categoryDirs) {
-        try {
-            const categoryPath = path.join(
-                __dirname,
-                "../../commands",
-                category,
-            );
-            const commandFiles = (await fs.readdir(categoryPath))
-                .filter((file) => file.endsWith(".js"))
-                .sort();
-
-            for (const file of commandFiles) {
-                const filePath = path.join(categoryPath, file);
-                const commandModule = await import(`file://${filePath}`);
-                const command = commandModule.default;
-                const commandData = normalizeCommandData(command);
-
-                if (commandData) {
-                    if (
-                        commandData.name === "help" ||
-                        commandData.name === "commandlist"
-                    )
-                        continue;
-
-                    const categoryName = formatCategoryName(category);
-
-                    allCommands.push(...buildHelpEntries(command, categoryName));
-                }
-            }
-        } catch (error) {
-            logger.error(
-                `Error reading commands from category ${category}:`,
-                error,
-            );
+    for (const command of client.commands.values()) {
+        if (command.data.name !== 'help') {
+            allCommands.push(...buildHelpEntries(command, formatCategoryName(command.category || 'Core')));
         }
     }
 
@@ -301,7 +237,7 @@ export async function createAllCommandsMenu(page = 1, client) {
         logger.error('Error fetching registered commands:', error);
     }
 
-    const totalPages = Math.ceil(allCommands.length / commandsPerPage);
+    const totalPages = Math.max(1, Math.ceil(allCommands.length / commandsPerPage));
     const startIndex = (page - 1) * commandsPerPage;
     const endIndex = startIndex + commandsPerPage;
     const pageCommands = allCommands.slice(startIndex, endIndex);

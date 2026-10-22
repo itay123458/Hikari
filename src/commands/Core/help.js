@@ -9,12 +9,7 @@ import { createEmbed } from "../../utils/embeds.js";
 import {
     createSelectMenu,
 } from "../../utils/components.js";
-import fs from "fs/promises";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { logger } from '../../utils/logger.js';
 
 const CATEGORY_SELECT_ID = "help-category-select";
 const ALL_COMMANDS_ID = "help-all-commands";
@@ -51,13 +46,8 @@ function formatCategoryName(rawCategory) {
 }
 
 export async function createInitialHelpMenu(client) {
-    const commandsPath = path.join(__dirname, "../../commands");
-    const categoryDirs = (
-        await fs.readdir(commandsPath, { withFileTypes: true })
-    )
-        .filter((dirent) => dirent.isDirectory())
-        .map((dirent) => dirent.name)
-        .sort();
+    const categoryDirs = [...new Set([...client.commands.values()].map(command => command.category || 'Core'))]
+        .sort((a, b) => (a === 'Anime' ? -1 : b === 'Anime' ? 1 : a.localeCompare(b)));
 
     const options = [
         {
@@ -78,31 +68,33 @@ export async function createInitialHelpMenu(client) {
 
     const botName = client?.user?.username || "Bot";
     const embed = createEmbed({
-        title: `📖 ${botName} Help`,
-        description: 'Set up your server, pick what to enable, then browse commands below. Use `/anime help` for anime discovery, private tracking and watch parties.',
+        title: `🌸 ${botName} • Palace Guide`,
+        description: 'Your private anime companion. Discover a new series, keep a private watchlist, and plan the next palace watch party. Use `/anime help` for the full anime guide.',
         color: 'primary',
         thumbnail: client.user?.displayAvatarURL?.({ size: 1024 }),
         fields: [
             {
                 name: '🚀 Getting Started',
                 value: [
-                    '**1. Launch setup** — Run `/configwizard` to configure prefix, mod role, and logs.',
-                    '**2. Enable systems** — Use `/commands dashboard` to turn categories on or off.',                    '**3. Browse commands** — Use the menu below to view categories and commands.',
+                    '**Find a show** — `/anime discover search`',
+                    '**Track your watchlist** — `/anime list add`',
+                    '**Plan a watch party** — `/anime club party`',
+                    '**Check airing times** — `/anime alerts schedule`',
                 ].join('\n'),
                 inline: false,
             },
             {
                 name: 'ℹ️ How It Works',
                 value: [
-                    '• Dashboard commands manage each feature visually',
-                    '• Settings are saved per server',
-                    '• Slash commands and prefixes both work once enabled',
+                    '• Music, essential moderation, and server setup stay available',
+                    '• Anime lists and notes are private by default',
+                    '• Admins: use `/configwizard` and `/commands dashboard` for server settings',
                 ].join('\n'),
                 inline: false,
             },
             {
                 name: '\u200B',
-                value: `-# ${botName} is [open source](https://youtu.be/1jCZX8s3bJE?si=NPOYx-vxVE1I5vJK)`,
+                value: `[Hikari source](https://github.com/itay123458/Hikari)`,
                 inline: false,
             },
         ],
@@ -119,8 +111,8 @@ export async function createInitialHelpMenu(client) {
         .setStyle(ButtonStyle.Danger);
 
     const supportButton = new ButtonBuilder()
-        .setLabel("Support Server")
-        .setURL("https://discord.gg/QnWNz2dKCE")
+        .setLabel("Hikari Source")
+        .setURL("https://github.com/itay123458/Hikari")
         .setStyle(ButtonStyle.Link);
 
     const selectRow = createSelectMenu(

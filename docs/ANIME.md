@@ -1,9 +1,11 @@
 # Hikari anime module
 
-This extends the existing TitanBot/Hikari JavaScript bot. Moderation, music,
-economy, leveling, tickets, birthdays, prefix commands, health endpoints and
-Docker deployment remain present. Anime commands are slash-only and use one
-global command, `/anime`, with the existing embed colors and command loader.
+Hikari focuses the existing JavaScript bot on a private anime club. Anime,
+essential moderation, music, roles, welcome settings, and useful server tools
+form the [29-command active catalogue](COMMANDS.md). Unrelated legacy commands
+are not loaded or registered; their stored data is preserved. Health endpoints
+and Docker deployment remain present. Anime commands are slash-only and use one
+global command, `/anime`, with Hikari's lavender theme and command loader.
 There is no separate web dashboard or new authentication system.
 
 ## Operator setup

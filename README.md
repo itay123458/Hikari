@@ -1,11 +1,14 @@
-# TitanBot - Ultimate Discord Bot
+# Hikari — Private Anime Bot
 
-## Hikari anime extension
+## Silver Palace edition
 
 Anime discovery, private watchlists and episode notes, recommendations,
 consent-based comparisons, release schedules/follows, watch parties, reviews,
 polls, guessing games, character tournaments and anime hubs are available under
-`/anime`. Existing bot features and deployment remain in place.
+`/anime`. Hikari registers 29 focused commands: anime, music, essential
+moderation, role menus, welcome configuration, logging, and member/server info.
+Economy, gambling, tickets, leveling, giveaways, and miscellaneous tools are
+retired from the active catalogue. See [the active commands](docs/COMMANDS.md).
 
 See [anime setup, command reference, privacy and provider limitations](docs/ANIME.md).
 For an isolated installation alongside other bots, see [Raspberry Pi deployment](docs/DEPLOYMENT-PI.md).
@@ -13,7 +16,13 @@ Jikan needs no key; AnimeSchedule schedules require `ANIMESCHEDULE_TOKEN` and
 persistent PostgreSQL. Crunchyroll integration uses provider-listed official
 links; regional availability, languages and actual publication are unknown.
 
-**TitanBot** is a powerful, feature-rich Discord bot designed to enhance your server experience with comprehensive moderation tools, engaging economy systems, utility features, and much more. Built with modern Discord.js v14 and PostgreSQL for optimal performance and data persistence.
+## Legacy upstream reference
+
+The remaining sections document the original TitanBot project, whose source
+modules are retained for compatibility and attribution. They describe features
+outside Hikari's active command set; use the Hikari links above for this bot.
+
+**TitanBot** is the upstream Discord.js v14 and PostgreSQL community bot.
 
 [![Support Server](https://img.shields.io/badge/-Support%20Server-%235865F2?logo=discord&logoColor=white&style=flat-square&logoWidth=20)](https://discord.gg/8kJBYhTGW9)
 [![Discord.js](https://img.shields.io/npm/v/discord.js?style=flat-square&labelColor=%23202225&color=%23202225&logo=npm&logoColor=white&logoWidth=20)](https://www.npmjs.com/package/discord.js)

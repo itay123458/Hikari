@@ -7,12 +7,13 @@ import { normalizeGuildConfig, validateGuildConfigOrThrow } from '../src/utils/s
 import { GUILD_CONFIG_DEFAULTS } from '../src/config/guild/guildConfigDefaults.js';
 import { redactSecrets } from '../src/utils/redactSecrets.js';
 
-test('existing and anime commands/components load together within Discord limits', async () => {
+test('Hikari loads anime and essential commands while retiring unrelated legacy commands', async () => {
   const client = { buttons: new Collection(), selectMenus: new Collection(), modals: new Collection() };
   await loadCommands(client); await loadInteractions(client);
-  for (const name of ['anime', 'help', 'play', 'ban', 'balance', 'birthday', 'ticket']) assert.ok(client.commands.has(name), `${name} did not load`);
+  for (const name of ['anime', 'help', 'commands', 'configwizard', 'play', 'music', 'ban', 'unban', 'timeout', 'untimeout', 'cases', 'reactroles', 'greet', 'logging', 'report']) assert.ok(client.commands.has(name), `${name} did not load`);
+  for (const name of ['balance', 'gamble', 'slut', 'birthday', 'ticket', 'massban', 'masskick', 'generatepassword', 'leaderboard', 'gcreate']) assert.equal(client.commands.has(name), false, `${name} should be retired`);
   const names = new Set([...client.commands.values()].map(c => c.data.name));
-  assert.ok(names.size <= 100, `Global slash command count is ${names.size}`);
+  assert.equal(names.size, 29);
   assert.ok(client.buttons.has('anime_ui')); assert.ok(client.selectMenus.has('anime_public')); assert.ok(client.modals.has('anime_form'));
   for (const command of new Set(client.commands.values())) command.data.toJSON();
 });
