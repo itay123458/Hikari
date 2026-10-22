@@ -6,6 +6,23 @@ PostgreSQL credentials and data. Do not copy credentials from another bot.
 The Pi override sets the Compose project to `hikari` and uses `hikari-bot`,
 `hikari-db` and `hikari-lavalink` container names. The network and PostgreSQL
 volume are scoped to this project. The optional local Lavalink profile stays off.
+Hikari's bot container uses public DNS servers for external providers; Docker
+continues resolving its private `db` service. This leaves the host and other
+bots' DNS settings unchanged.
+The image build also checks critical runtime imports so a partial npm install
+cannot silently produce an unusable bot image.
+
+If the host's DNS is unavailable during a build, container runtime DNS alone
+does not repair the builder. Resolve `registry.npmjs.org` using a working DNS
+resolver, then pass that current IPv4 result to a single build:
+
+```sh
+docker build --no-cache --add-host registry.npmjs.org:RESOLVED_IPV4 -t hikari-bot .
+```
+
+This keeps normal HTTPS certificate verification and does not change host DNS.
+After a successful build, use the Compose command below with `--no-build` in
+place of `--build`. Do not permanently pin an old registry IP address.
 
 ## Private environment
 

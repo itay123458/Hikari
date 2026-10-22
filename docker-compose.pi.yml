@@ -4,6 +4,11 @@ name: hikari
 services:
   bot:
     container_name: hikari-bot
+    # Resolve public providers independently of the host's Tailscale resolver.
+    # Docker's embedded resolver still handles this project's db service.
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
   db:
     container_name: hikari-db
   lavalink:
