@@ -1,3 +1,4 @@
+import './art.js';
 const $ = selector => document.querySelector(selector);
 const labels = { overview: 'Overview', commands: 'Command library', setup: 'Server setup', privacy: 'Privacy & care' };
 let catalogue, category = 'All', pendingQuery = '', toastTimer;
@@ -11,6 +12,7 @@ function route({ focus = false } = {}) {
   document.title = `Hikari · ${labels[view]}`;
   if (view === 'commands' && pendingQuery) { $('#command-search').value = pendingQuery; category = 'All'; pendingQuery = ''; renderCommands(); }
   if (focus) { $('#main').focus({ preventScroll: true }); window.scrollTo({ top: 0, behavior: 'instant' }); }
+  document.dispatchEvent(new Event('hikari:viewchange'));
 }
 window.addEventListener('hashchange', () => route({ focus: true }));
 route();
@@ -55,26 +57,3 @@ try {
   }
   renderCommands();
 } catch { $('#catalogue-error').hidden = false; notify('Command library unavailable. Please refresh or use /help in Discord.'); }
-
-$('#explore-3d').addEventListener('click', async () => {
-  const button = $('#explore-3d'), stage = $('#art-stage'), status = $('#model-status');
-  button.disabled = true; status.textContent = 'Loading the interactive 3D scene.'; button.textContent = 'Loading 3D…';
-  let viewer;
-  try {
-    if (!customElements.get('model-viewer')) {
-      await new Promise((resolve, reject) => {
-        const script = document.createElement('script'); script.type = 'module'; script.src = 'https://ajax.googleapis.com/ajax/libs/model-viewer/4.4.0/model-viewer.min.js';
-        const timeout = setTimeout(() => { script.remove(); reject(new Error('Viewer timed out')); }, 15000);
-        script.onload = () => { clearTimeout(timeout); resolve(); }; script.onerror = () => { clearTimeout(timeout); script.remove(); reject(new Error('Viewer unavailable')); }; document.head.append(script);
-      });
-    }
-    viewer = document.createElement('model-viewer');
-    viewer.setAttribute('src', 'assets/hikari-palace.glb'); viewer.setAttribute('poster', 'assets/hikari-palace.webp'); viewer.setAttribute('alt', 'Interactive Hikari moon-cat diorama. Drag to rotate or use arrow keys.');
-    viewer.setAttribute('camera-controls', ''); viewer.setAttribute('touch-action', 'pan-y'); viewer.setAttribute('camera-orbit', '32deg 68deg auto'); viewer.setAttribute('shadow-intensity', '0.7');
-    const fail = () => { clearTimeout(modelTimeout); viewer.remove(); stage.querySelector('img').hidden = false; button.disabled = false; button.textContent = 'Retry 3D'; status.textContent = '3D could not load. The original artwork is still available.'; notify(status.textContent); };
-    const modelTimeout = setTimeout(fail, 20000);
-    viewer.addEventListener('error', fail, { once: true });
-    viewer.addEventListener('load', () => { clearTimeout(modelTimeout); stage.querySelector('img').hidden = true; button.hidden = true; status.textContent = '3D scene ready. Drag to rotate; use arrow keys when focused.'; }, { once: true });
-    stage.append(viewer);
-  } catch { viewer?.remove(); button.disabled = false; button.textContent = 'Retry 3D'; status.textContent = '3D could not load. The original artwork is still available.'; notify(status.textContent); }
-});

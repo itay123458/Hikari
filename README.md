@@ -4,7 +4,7 @@
 
 [Invite Hikari](https://discord.com/oauth2/authorize?client_id=1562836610800685118&scope=bot%20applications.commands&integration_type=0&permissions=1409021242582) · [Open the bot hub](https://itay123458.github.io/Hikari/) · [Source code](https://github.com/itay123458/Hikari)
 
-<p align="center"><a href="https://itay123458.github.io/Hikari/"><img src="site/assets/hikari-palace.webp" width="520" alt="Hikari's original 3D moon-cat reading sanctuary, with a torii gate, sakura and crescent moon"></a></p>
+<p align="center"><a href="https://itay123458.github.io/Hikari/"><img src="site/assets/hikari-midnight.webp" width="520" alt="Hikari's detailed midnight sanctuary, with engraved torii, gilded book, ribbed lanterns, sakura, and crescent moon"></a></p>
 
 Hikari brings anime discovery, private watchlists, airing schedules, watch
 parties, and community activities into one Discord bot. Built for Silver
@@ -12,8 +12,8 @@ Palace, it can also be invited to your own server. The focused command set
 includes essential moderation, music, roles, and welcome tools.
 
 The public **[Hikari hub](https://itay123458.github.io/Hikari/)** includes an
-interactive command library, server setup guide, privacy information, and an
-original Blender scene you can explore in 3D. Server configuration stays inside
+interactive command library, server setup guide, privacy information, and
+three original, animated Blender scenes you can explore in 3D. Server configuration stays inside
 Discord. Use `/help` or `/anime help` to get started.
 
 To invite the hosted bot, choose **Invite Hikari** above and select a server you
@@ -197,7 +197,13 @@ the active command loader and copies only public names, descriptions, categories
 and links. No bot login or secrets are needed to build the hub.
 
 GitHub Actions deploys only `site/` to GitHub Pages on pushes to `main`.
-The original artwork, editable Blender file, and reproducible generator live in
+The hub uses a midnight violet theme throughout. The original Blender artwork
+includes a detailed moonlit sanctuary, astral lantern, and celestial grimoire,
+each with an eight-second animation. A small rendered preview plays in the hero;
+full 3D models load only when requested. Play/pause controls, reduced-motion
+preferences, and hidden-page pausing apply to motion.
+
+The artwork, editable Blender files, and reproducible generators live in
 [`design/`](design/README.md). The optional 3D viewer uses model-viewer 4.4.0;
-text and static artwork remain usable when it cannot load. Fonts use Google
-Fonts with local fallbacks. No analytics are added.
+text and static artwork remain usable when video or 3D cannot load. Fonts use
+Google Fonts with local fallbacks. No analytics are added.
