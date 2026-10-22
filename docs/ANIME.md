@@ -28,6 +28,24 @@ There is no separate web dashboard or new authentication system.
 6. Approve optional mention roles with `/anime admin roles`. Then follow an
    anime with `/anime alerts follow server:true` and optionally select an
    approved role. Enable weekly/news/trailer posts with `/anime admin feeds`.
+7. For optional conversation starters, choose a text channel with
+   `/anime admin channels conversation:#anime-chat`, then set
+   `/anime admin feeds prompt-days:2` for every other day. Use `1` for daily,
+   `0` to disable, or an interval up to seven days. This feature defaults off.
+
+Conversation starters contain original, spoiler-free questions without mass
+pings or DMs. They use the server time zone and post during 18:30–21:30, subject
+to quiet hours. Each reservation and job is saved together in PostgreSQL;
+restarts and concurrent scans cannot reserve a duplicate or an adjacent-day
+post inside the chosen interval. Old-day jobs are canceled instead of flooding
+the channel after downtime. Failed or uncertain sends still consume their
+reserved interval. Disabling the community module, notifications, or prompts,
+or changing the configured channel, prevents queued prompts from posting.
+Calendar-day spacing handles daylight-saving changes. Prompts need no anime
+provider access, although a provider timeout can delay the shared scan.
+
+See [the private server role model](SERVER-ROLES.md) for membership, staff,
+read-only boards, and interest-role permissions.
 
 Manage Server is checked in code for administrative actions, server follows
 and hub management. Members also need View Channel and Send Messages to create

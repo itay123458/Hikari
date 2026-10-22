@@ -14,7 +14,7 @@ export async function adminCommand(interaction, client, ctx, settings, sub) {
       if (value !== null) patch[key] = value === 'off' ? null : value;
     }
   } else if (sub === 'channels') {
-    for (const [option, key] of [['announcements', 'announcementChannel'], ['news', 'newsChannel'], ['schedule', 'scheduleChannel']]) {
+    for (const [option, key] of [['announcements', 'announcementChannel'], ['news', 'newsChannel'], ['schedule', 'scheduleChannel'], ['conversation', 'conversationChannel']]) {
       const channel = o.getChannel(option);
       if (channel) { await sendableChannel(interaction.guild, channel.id); patch[key] = channel.id; }
     }
@@ -33,6 +33,9 @@ export async function adminCommand(interaction, client, ctx, settings, sub) {
     }
     if (patch.weekly && !settings.scheduleChannel) throw new Error('Configure a schedule channel first.');
     if ((patch.news || patch.trailers) && !settings.newsChannel) throw new Error('Configure a news channel first.');
+    const days = o.getInteger('prompt-days');
+    if (days !== null) patch.conversationDays = days;
+    if (patch.conversationDays && !settings.conversationChannel) throw new Error('Configure a conversation channel first with /anime admin channels.');
   } else if (sub === 'mapping') {
     const id = animeId(o.getString('anime')), slug = o.getString('slug');
     const [mal, scheduled] = await Promise.all([ctx.jikan.anime(id), ctx.schedule.anime(slug)]);
@@ -55,5 +58,5 @@ export async function adminCommand(interaction, client, ctx, settings, sub) {
   const next = validateSettings({ ...settings, ...patch });
   if (Boolean(next.quietStart) !== Boolean(next.quietEnd)) throw new Error('Set both quiet-start and quiet-end, or set both to off.');
   await patchGuildConfig(client, guildId, { anime: next });
-  return message('Anime server settings', `Enabled: **${next.enabled}**\nModules: ${next.modules.join(', ') || 'None'}\nTime zone: **${next.timezone}** · Title language: ${next.language}\nSpoilers hidden: ${next.hideSpoilers}\nQuiet hours: ${next.quietStart || 'Off'}${next.quietEnd ? `–${next.quietEnd}` : ''}\nNotifications: ${next.notifications} · Weekly: ${next.weekly} · News: ${next.news} · Trailers: ${next.trailers}\nChannels: announcements ${next.announcementChannel ? `<#${next.announcementChannel}>` : 'unset'} · news ${next.newsChannel ? `<#${next.newsChannel}>` : 'unset'} · schedule ${next.scheduleChannel ? `<#${next.scheduleChannel}>` : 'unset'}\nApproved mention roles: ${next.approvedRoles.length}`);
+  return message('Anime server settings', `Enabled: **${next.enabled}**\nModules: ${next.modules.join(', ') || 'None'}\nTime zone: **${next.timezone}** · Title language: ${next.language}\nSpoilers hidden: ${next.hideSpoilers}\nQuiet hours: ${next.quietStart || 'Off'}${next.quietEnd ? `–${next.quietEnd}` : ''}\nNotifications: ${next.notifications} · Weekly: ${next.weekly} · News: ${next.news} · Trailers: ${next.trailers}\nConversation prompts: ${next.conversationDays ? `every ${next.conversationDays} day(s), 18:30–21:30` : 'Off'}${next.conversationChannel ? ` in <#${next.conversationChannel}>` : ''}\nChannels: announcements ${next.announcementChannel ? `<#${next.announcementChannel}>` : 'unset'} · news ${next.newsChannel ? `<#${next.newsChannel}>` : 'unset'} · schedule ${next.scheduleChannel ? `<#${next.scheduleChannel}>` : 'unset'}\nApproved mention roles: ${next.approvedRoles.length}`);
 }

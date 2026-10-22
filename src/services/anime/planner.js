@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { localDate, localTime, isoWeek, validateSettings } from './domain.js';
 import { resolveMapping, safeUrl } from './providers.js';
 import { logger } from '../../utils/logger.js';
+import { calendarDay } from './conversation.js';
 
 export const digest = value => createHash('sha256').update(JSON.stringify(value)).digest('hex').slice(0, 24);
 export const episodeKey = (target, id, event) => `episode:${target}:${id}:${event.type}:${event.episode}`;
@@ -40,7 +41,10 @@ export class AnimePlanner {
             await store.enqueue(`weekly:${guild.id}:${week.year}:${week.week}`, 'weekly', { guildId: guild.id, ...week }, now);
           }
         }
-        if (settings.modules.includes('community') && settings.notifications) await this.parties(guild.id, state);
+        if (settings.modules.includes('community') && settings.notifications) {
+          await this.parties(guild.id, state);
+          await this.conversations(guild.id, settings, now);
+        }
         if (settings.modules.includes('community') && await store.acquireLease(`hubs:${guild.id}`, now, 900000)) {
           for (const key of Object.keys(state.hubs)) await store.enqueue(`hub:${guild.id}:${key}:${Math.floor(+now / 900000)}`, 'hub', { guildId: guild.id, key }, now);
         }
@@ -68,6 +72,19 @@ export class AnimePlanner {
   async settings(guildId) {
     const { getGuildConfig } = await import('../config/guildConfig.js');
     return validateSettings((await getGuildConfig(this.client, guildId, { failClosed: true })).anime);
+  }
+  async conversations(guildId, settings, now = this.now()) {
+    const time = localTime(now, settings.timezone);
+    if (!settings.conversationDays || !settings.conversationChannel || time < '18:30' || time >= '21:30') return;
+    const date = localDate(now, settings.timezone);
+    // Reserve the date and enqueue in one transaction. A crash or two scanners
+    // cannot create adjacent-day posts or duplicate a reserved conversation.
+    await this.ctx.store.transaction(tx => tx.mutate('conversation-state', guildId, async current => {
+      if (current.lastDate && calendarDay(date) - calendarDay(current.lastDate) < settings.conversationDays) return current;
+      const sequence = current.sequence || 0;
+      await tx.enqueue(`conversation:${guildId}:${date}`, 'conversation', { guildId, date, sequence, channelId: settings.conversationChannel, days: settings.conversationDays }, now);
+      return { lastDate: date, sequence: sequence + 1 };
+    }));
   }
   async follow(guildId, follow, timetable, userId = null) {
     const { store } = this.ctx;

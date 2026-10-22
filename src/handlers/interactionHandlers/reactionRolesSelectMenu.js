@@ -4,7 +4,7 @@ import { logger } from '../../utils/logger.js';
 import { handleInteractionError, createError, ErrorTypes } from '../../utils/errorHandler.js';
 import { getColor } from '../../config/bot.js';
 import { logEvent, EVENT_TYPES } from '../../services/loggingService.js';
-import { getReactionRoleMessage } from '../../services/reactionRoleService.js';
+import { getReactionRoleMessage, hasDangerousPermissions } from '../../services/reactionRoleService.js';
 
 export async function handleReactionRolesSelectMenu(interaction, client) {
     try {
@@ -58,6 +58,9 @@ export async function handleReactionRolesSelectMenu(interaction, client) {
             );
         }
 
+        // A role can gain staff permissions after a panel was created. Refresh
+        // once and apply the same safety policy to additions and removals.
+        const currentRoles = await interaction.guild.roles.fetch();
         const botRolePosition = me.roles.highest.position;
 
         const availableRoleIds = Array.isArray(reactionRoleData.roles)
@@ -74,25 +77,14 @@ export async function handleReactionRolesSelectMenu(interaction, client) {
                 continue;
             }
 
-            const role = interaction.guild.roles.cache.get(roleId);
+            const role = currentRoles.get(roleId);
             if (!role) {
                 logger.warn(`Role ${roleId} not found in guild ${interaction.guildId}`);
                 skippedRoles.push(roleId);
                 continue;
             }
 
-            const roleHasDangerousPermissions = role.permissions.has([
-                'Administrator',
-                'ManageGuild',
-                'ManageRoles',
-                'ManageChannels',
-                'ManageWebhooks',
-                'BanMembers',
-                'KickMembers',
-                'MentionEveryone'
-            ]);
-
-            if (role.managed || roleHasDangerousPermissions) {
+            if (role.managed || hasDangerousPermissions(role)) {
                 logger.warn(`Blocked self-assignment for protected role ${role.name} (${roleId})`);
                 skippedRoles.push(role.name);
                 continue;
@@ -119,8 +111,9 @@ export async function handleReactionRolesSelectMenu(interaction, client) {
         for (const roleId of availableRoleIds) {
             if (selectedRoleIds.includes(roleId)) continue;
 
-            const role = interaction.guild.roles.cache.get(roleId);
+            const role = currentRoles.get(roleId);
             if (!role) continue;
+            if (role.managed || hasDangerousPermissions(role)) continue;
 
             if (role.position >= botRolePosition) continue;
 

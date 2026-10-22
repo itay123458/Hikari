@@ -2,7 +2,8 @@ import { PermissionFlagsBits } from 'discord.js';
 import { randomUUID } from 'node:crypto';
 import { AnimePlanner } from './planner.js';
 import { deliverOnce } from './notifications.js';
-import { quietUntil, validateSettings, isoWeek } from './domain.js';
+import { quietUntil, validateSettings, isoWeek, localDate } from './domain.js';
+import { CONVERSATION_PROMPTS } from './conversation.js';
 import { getGuildConfig } from '../config/guildConfig.js';
 import { isCommandEnabledInConfig } from '../commandAccessService.js';
 import { isMaintenanceMode, isCommandCategoryEnabled } from '../../config/bot.js';
@@ -65,13 +66,14 @@ export class AnimeWorker {
     const guild = this.client.guilds.cache.get(job.payload.guildId);
     if (!guild) return this.ctx.store.finish(job.id, 'canceled');
     const config = await getGuildConfig(this.client, guild.id, { failClosed: true }), settings = validateSettings(config.anime);
-    const module = ['party', 'party-change', 'hub'].includes(job.kind) ? 'community' : job.kind === 'inactivity' ? 'tracking' : 'announcements';
+    const module = ['party', 'party-change', 'hub', 'conversation'].includes(job.kind) ? 'community' : job.kind === 'inactivity' ? 'tracking' : 'announcements';
     if (!settings.enabled || !settings.modules.includes(module) || !isCommandEnabledInConfig(config, 'anime', 'Anime') || (job.kind !== 'hub' && !settings.notifications)) return this.ctx.store.finish(job.id, 'canceled');
     if (job.kind !== 'hub' && await this.quiet(job, settings)) return;
     if (job.kind === 'episode') return this.handleEpisode(job, settings);
     if (job.kind === 'update') return this.handleUpdate(job, settings);
     if (job.kind === 'feed') return this.handleFeed(job, settings);
     if (job.kind === 'weekly') return this.handleWeekly(job, settings);
+    if (job.kind === 'conversation') return this.handleConversation(job, settings);
     if (job.kind === 'party' || job.kind === 'party-change') return this.handleParty(job, settings);
     if (job.kind === 'inactivity') return this.handleInactivity(job, settings);
     if (job.kind === 'hub') { await refreshPublication(this.ctx, guild, 'hubs', job.payload.key, settings); return this.ctx.store.finish(job.id); }
@@ -126,6 +128,13 @@ export class AnimeWorker {
     const title = job.kind === 'party-change' ? (party.canceled ? 'Watch party canceled' : 'Watch party rescheduled') : p.minutes ? 'Watch party starts soon' : 'Watch party start time';
     return this.send(job, settings, message(title, `**${text(party.title)}** · ID ${party.id}\n${timestamp(party.startsAt)}${party.messageId ? `\n[Party details](https://discord.com/channels/${p.guildId}/${party.channelId}/${party.messageId})` : ''}\nYou received this private DM because you RSVP’d Going. Select No on the party to stop reminders.`));
   }
+  async handleConversation(job, settings) {
+    const p = job.payload;
+    if (!settings.conversationDays || settings.conversationDays !== p.days || settings.conversationChannel !== p.channelId || p.date !== localDate(this.now(), settings.timezone)) return this.ctx.store.finish(job.id, 'canceled');
+    if (await this.quiet(job, { ...settings, quietStart: '21:30', quietEnd: '18:30' })) return;
+    const prompt = CONVERSATION_PROMPTS[(p.sequence || 0) % CONVERSATION_PROMPTS.length];
+    return this.send(job, settings, message('Palace conversation starter', `${prompt}\n\nReply here or start a thread. Keep plot details behind spoiler tags and let everyone enjoy their first watch.`));
+  }
   async handleInactivity(job, settings) {
     const p = job.payload, profile = await this.ctx.tracking.profile(p.userId);
     const latest = [profile.reminderSetAt, ...Object.values(profile.list).map(a => a.updatedAt), ...profile.history.map(h => h.at)].filter(Boolean).sort().at(-1);
@@ -141,7 +150,7 @@ export class AnimeWorker {
       try { channel = await member.user.createDM(); }
       catch { return this.ctx.store.finish(job.id, 'blocked'); }
     } else {
-      const channelId = job.kind === 'weekly' ? settings.scheduleChannel : job.kind === 'feed' && ['news', 'trailers'].includes(p.feedType) ? settings.newsChannel : settings.announcementChannel;
+      const channelId = job.kind === 'conversation' ? settings.conversationChannel : job.kind === 'weekly' ? settings.scheduleChannel : job.kind === 'feed' && ['news', 'trailers'].includes(p.feedType) ? settings.newsChannel : settings.announcementChannel;
       if (!channelId) return this.ctx.store.finish(job.id, 'canceled');
       try { channel = await sendableChannel(guild, channelId, [PermissionFlagsBits.ReadMessageHistory]); }
       catch { return this.ctx.store.finish(job.id, 'failed'); }

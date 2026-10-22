@@ -9,6 +9,8 @@ export const AnimeSettingsSchema = z.object({
   announcementChannel: z.string().nullable().default(null),
   newsChannel: z.string().nullable().default(null),
   scheduleChannel: z.string().nullable().default(null),
+  conversationChannel: z.string().nullable().default(null),
+  conversationDays: z.number().int().min(0).max(7).default(0),
   approvedRoles: z.array(z.string()).default([]),
   timezone: z.string().refine(value => {
     try { new Intl.DateTimeFormat('en', { timeZone: value }); return true; } catch { return false; }

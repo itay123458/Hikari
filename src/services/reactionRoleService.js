@@ -13,7 +13,20 @@ const DANGEROUS_PERMISSIONS = [
     'ManageChannels',
     'ManageWebhooks',
     'BanMembers',
-    'KickMembers'
+    'KickMembers',
+    'ModerateMembers',
+    'ManageMessages',
+    'ManageThreads',
+    'ViewAuditLog',
+    'ManageNicknames',
+    'MoveMembers',
+    'MuteMembers',
+    'DeafenMembers',
+    'ManageEvents',
+    'CreateEvents',
+    'MentionEveryone',
+    'CreateInstantInvite',
+    'ManageGuildExpressions'
 ];
 
 function validateGuildId(guildId) {
