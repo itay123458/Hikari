@@ -1,14 +1,26 @@
 # 🌸 Hikari
 
-**A private anime companion for Silver Palace.**
+**Your anime companion for Discord communities.**
 
-Hikari brings anime discovery, personal watchlists, airing schedules, watch
-parties, and community activities into one Discord bot. Its lavender theme,
-role menus, and focused command set are built around a private anime club.
+[Invite Hikari](https://discord.com/oauth2/authorize?client_id=1562836610800685118&scope=bot%20applications.commands&integration_type=0&permissions=1409021242582) · [Open the bot hub](https://itay123458.github.io/Hikari/) · [Source code](https://github.com/itay123458/Hikari)
 
-This repository is private. Setup instructions are for maintainers with
-repository access. Members can use `/help` or `/anime help`, and contact the
-server owner or staff for support.
+<p align="center"><a href="https://itay123458.github.io/Hikari/"><img src="site/assets/hikari-palace.webp" width="520" alt="Hikari's original 3D moon-cat reading sanctuary, with a torii gate, sakura and crescent moon"></a></p>
+
+Hikari brings anime discovery, private watchlists, airing schedules, watch
+parties, and community activities into one Discord bot. Built for Silver
+Palace, it can also be invited to your own server. The focused command set
+includes essential moderation, music, roles, and welcome tools.
+
+The public **[Hikari hub](https://itay123458.github.io/Hikari/)** includes an
+interactive command library, server setup guide, privacy information, and an
+original Blender scene you can explore in 3D. Server configuration stays inside
+Discord. Use `/help` or `/anime help` to get started.
+
+To invite the hosted bot, choose **Invite Hikari** above and select a server you
+manage. The invite requests feature permissions without Administrator. Run
+`/configwizard` for the basics, then `/anime admin` for anime channels and club
+settings. The Silver Palace channel/role layout is a server-specific example;
+inviting Hikari does not automatically copy it to another server.
 
 ## What Hikari does
 
@@ -176,3 +188,16 @@ instance through `TEST_POSTGRES_URL`.
 Hikari builds on TitanBot by **codebymitch**. Original copyright notices and
 the [MIT license](LICENSE) are retained. Repository visibility does not change
 those upstream license notices.
+
+## Public hub development
+
+Run `npm ci` and `npm run build:site`, then serve the `site/` directory with a
+static HTTP server. The build derives its 29-command, 107-entry catalogue from
+the active command loader and copies only public names, descriptions, categories,
+and links. No bot login or secrets are needed to build the hub.
+
+GitHub Actions deploys only `site/` to GitHub Pages on pushes to `main`.
+The original artwork, editable Blender file, and reproducible generator live in
+[`design/`](design/README.md). The optional 3D viewer uses model-viewer 4.4.0;
+text and static artwork remain usable when it cannot load. Fonts use Google
+Fonts with local fallbacks. No analytics are added.

@@ -5,6 +5,8 @@ import { loadCommands, registerCommands } from '../src/handlers/loaders/commandL
 import { createInitialHelpMenu } from '../src/commands/Core/help.js';
 import { createAllCommandsMenu, helpCategorySelectMenu } from '../src/handlers/help/helpSelectMenus.js';
 import { helpBugReportButton } from '../src/handlers/help/helpButtons.js';
+import { INVITE_URL, SOURCE_URL, DASHBOARD_URL, INVITE_PERMISSIONS } from '../src/config/publicLinks.js';
+import { PermissionFlagsBits } from 'discord.js';
 
 async function fixture() {
   const client = { user: { username: 'Hikari', displayAvatarURL: () => undefined } };
@@ -33,7 +35,11 @@ test('help navigation and every page describe the active commands rather than ar
   assert(options.some(option => option.value === 'Anime'));
   for (const category of ['Economy', 'Ticket', 'Tools', 'Fun', 'Leveling', 'Giveaway', 'Community', 'Birthday']) assert(!options.some(option => option.value === category), `${category} must not appear`);
   const initialText = JSON.stringify({ rows, embeds: initial.embeds.map(embed => embed.toJSON()) });
-  assert(!/youtu\.be|discord\.gg|github\.com|codebymitch|TitanBot/.test(initialText));
+  assert(!/youtu\.be|discord\.gg|codebymitch|TitanBot/.test(initialText));
+  const links = rows.flatMap(row => row.components).filter(c => c.style === 5).map(c => c.url);
+  assert.deepEqual(new Set(links), new Set([SOURCE_URL, INVITE_URL, DASHBOARD_URL]));
+  assert.equal(INVITE_PERMISSIONS & PermissionFlagsBits.Administrator, 0n);
+  assert.equal(new URL(INVITE_URL).searchParams.get('scope'), 'bot applications.commands');
   let report;
   await helpBugReportButton.execute({ reply: async body => { report = body; } }, client);
   assert.deepEqual(report.components, []);

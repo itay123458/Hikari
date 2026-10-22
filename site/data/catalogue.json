@@ -1,0 +1,545 @@
+{
+  "links": {
+    "invite": "https://discord.com/oauth2/authorize?client_id=1562836610800685118&scope=bot+applications.commands&integration_type=0&permissions=1409021242582",
+    "source": "https://github.com/itay123458/Hikari",
+    "dashboard": "https://itay123458.github.io/Hikari/"
+  },
+  "topLevelCount": 29,
+  "commands": [
+    {
+      "name": "/anime",
+      "description": "Hikari anime discovery, private tracking and community",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime admin channels",
+      "description": "Set anime feeds and conversation channels",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime admin chronology",
+      "description": "Save a sourced, verified chronological order",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime admin feeds",
+      "description": "Configure anime feeds and optional conversation starters",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime admin mapping",
+      "description": "Confirm exact MAL-to-AnimeSchedule mapping",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime admin modules",
+      "description": "Enable/disable a module",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime admin roles",
+      "description": "Allow or remove a mention role for server follows",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime admin settings",
+      "description": "Show or update anime preferences (Manage Server)",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime alerts countdown",
+      "description": "Next mapped episode time, preserving release type",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime alerts follow",
+      "description": "Follow release tracks privately or for this server",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime alerts following",
+      "description": "View your private or server follows",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime alerts schedule",
+      "description": "Today or weekly AnimeSchedule timetable",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime alerts unfollow",
+      "description": "Stop following an anime",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime club cancel",
+      "description": "Cancel your party (or Manage Server)",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime club discuss",
+      "description": "Create a spoiler-labeled episode discussion thread",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime club favorites",
+      "description": "Server favorites from explicitly public reviews",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime club hub",
+      "description": "Post a refreshable anime hub (Manage Server)",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime club parties",
+      "description": "Browse upcoming watch parties",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime club party",
+      "description": "Post a watch party with RSVP and private reminders",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime club poll",
+      "description": "Post a persistent voting poll",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime club refresh",
+      "description": "Refresh this channel’s hub for an anime (Manage Server)",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime club reschedule",
+      "description": "Reschedule a party you own (or Manage Server)",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime club review",
+      "description": "Explicitly publish an episode-context review",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime club reviews",
+      "description": "Browse review metadata; reveal text privately",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime discover character",
+      "description": "Search characters and their voice actors",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime discover detail",
+      "description": "Show anime metadata and official streaming links",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime discover order",
+      "description": "Sourced release order or verified chronological guide",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime discover search",
+      "description": "Search anime with filters and result selection",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime discover season",
+      "description": "Browse current, previous or upcoming seasons",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime discover voice",
+      "description": "Search people and voice acting credits",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime games advance",
+      "description": "Close current match and advance your tournament",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime games answer",
+      "description": "Submit a private guess",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime games bracket",
+      "description": "Show a character tournament",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime games guess",
+      "description": "Start a clue, silhouette or image reveal guessing game",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime games reveal",
+      "description": "Reveal the next clue/image stage in your game",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime games tournament",
+      "description": "Start a persistent character voting bracket",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime help",
+      "description": "Anime commands, privacy and provider information",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list add",
+      "description": "Add or change an anime in your private watchlist",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list challenge",
+      "description": "Set a private monthly episode challenge",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list compare",
+      "description": "Private compatibility comparison with a consenting member",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list delete",
+      "description": "Confirm deletion of your anime data across servers",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list export",
+      "description": "Export your anime data privately as JSON",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list note",
+      "description": "Write a private episode note in a form",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list notes",
+      "description": "Read your private episode note",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list preferences",
+      "description": "Set preferred genres for recommendations",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list privacy",
+      "description": "Opt in or revoke sharing and comparisons in this server",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list progress",
+      "description": "Set your recorded episode progress",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list random",
+      "description": "Pick from your watchlist with filters",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list rate",
+      "description": "Save a private 1–10 rating",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list recommend",
+      "description": "Recommendations from API results, ratings and history",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list reminders",
+      "description": "Opt into or disable private inactivity reminders",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list remove",
+      "description": "Remove an entry from your watchlist",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list shared",
+      "description": "Anime you and a consenting member can watch together",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list show",
+      "description": "Your private watchlist with progress controls",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime list stats",
+      "description": "Estimated watch time and monthly episode progress",
+      "category": "Anime"
+    },
+    {
+      "name": "/avatar",
+      "description": "Display a user's avatar image",
+      "category": "Utility"
+    },
+    {
+      "name": "/ban",
+      "description": "Ban a user from the server",
+      "category": "Moderation"
+    },
+    {
+      "name": "/cases",
+      "description": "View moderation cases and audit logs",
+      "category": "Moderation"
+    },
+    {
+      "name": "/commands",
+      "description": "Enable or disable bot commands and categories for this server",
+      "category": "Core"
+    },
+    {
+      "name": "/commands dashboard",
+      "description": "Open the interactive command access dashboard",
+      "category": "Core"
+    },
+    {
+      "name": "/commands disable",
+      "description": "Disable a command or entire category",
+      "category": "Core"
+    },
+    {
+      "name": "/commands enable",
+      "description": "Enable a command or entire category",
+      "category": "Core"
+    },
+    {
+      "name": "/configwizard",
+      "description": "Open the server configuration dashboard and setup wizard",
+      "category": "Core"
+    },
+    {
+      "name": "/greet",
+      "description": "Manage welcome & goodbye settings",
+      "category": "Welcome"
+    },
+    {
+      "name": "/greet dashboard",
+      "description": "Open the welcome & goodbye configuration dashboard",
+      "category": "Welcome"
+    },
+    {
+      "name": "/help",
+      "description": "Displays the help menu with all available commands",
+      "category": "Core"
+    },
+    {
+      "name": "/kick",
+      "description": "Kick a user from the server",
+      "category": "Moderation"
+    },
+    {
+      "name": "/lock",
+      "description": "Locks the current channel (prevents @everyone from sending messages).",
+      "category": "Moderation"
+    },
+    {
+      "name": "/logging",
+      "description": "Manage server logging — channels, filters, and event categories.",
+      "category": "Logging"
+    },
+    {
+      "name": "/logging channel",
+      "description": "Quick-set a log channel without opening the dashboard.",
+      "category": "Logging"
+    },
+    {
+      "name": "/logging dashboard",
+      "description": "Open the logging dashboard — set channels, filters, and toggle categories.",
+      "category": "Logging"
+    },
+    {
+      "name": "/music",
+      "description": "Manage playback, queue, and voice session settings",
+      "category": "Music"
+    },
+    {
+      "name": "/music 247",
+      "description": "Toggle 24/7 mode (stay in voice channel when idle)",
+      "category": "Music"
+    },
+    {
+      "name": "/music clear",
+      "description": "Clear the queue",
+      "category": "Music"
+    },
+    {
+      "name": "/music leave",
+      "description": "Disconnect the bot from the voice channel",
+      "category": "Music"
+    },
+    {
+      "name": "/music loop",
+      "description": "Set loop mode",
+      "category": "Music"
+    },
+    {
+      "name": "/music move",
+      "description": "Move a track in the queue",
+      "category": "Music"
+    },
+    {
+      "name": "/music pause",
+      "description": "Pause playback",
+      "category": "Music"
+    },
+    {
+      "name": "/music remove",
+      "description": "Remove a track from the queue",
+      "category": "Music"
+    },
+    {
+      "name": "/music resume",
+      "description": "Resume playback",
+      "category": "Music"
+    },
+    {
+      "name": "/music seek",
+      "description": "Seek to a position in the current track",
+      "category": "Music"
+    },
+    {
+      "name": "/music shuffle",
+      "description": "Shuffle the queue",
+      "category": "Music"
+    },
+    {
+      "name": "/music skip",
+      "description": "Skip the current track",
+      "category": "Music"
+    },
+    {
+      "name": "/music stop",
+      "description": "Stop playback and clear the queue",
+      "category": "Music"
+    },
+    {
+      "name": "/music volume",
+      "description": "Set playback volume",
+      "category": "Music"
+    },
+    {
+      "name": "/nowplaying",
+      "description": "Show the currently playing track",
+      "category": "Music"
+    },
+    {
+      "name": "/ping",
+      "description": "Checks the bot's latency and API speed",
+      "category": "Core"
+    },
+    {
+      "name": "/play",
+      "description": "Play a song or add it to the queue",
+      "category": "Music"
+    },
+    {
+      "name": "/purge",
+      "description": "Delete a specific amount of messages",
+      "category": "Moderation"
+    },
+    {
+      "name": "/queue",
+      "description": "Show the current music queue",
+      "category": "Music"
+    },
+    {
+      "name": "/reactroles",
+      "description": "Manage reaction role assignments",
+      "category": "Reaction_roles"
+    },
+    {
+      "name": "/reactroles dashboard",
+      "description": "Manage and configure your reaction role panels",
+      "category": "Reaction_roles"
+    },
+    {
+      "name": "/reactroles setup",
+      "description": "Set up a new reaction role panel",
+      "category": "Reaction_roles"
+    },
+    {
+      "name": "/report",
+      "description": "Report a user to server staff, or configure where reports are sent.",
+      "category": "Utility"
+    },
+    {
+      "name": "/report file",
+      "description": "Report a user to the server moderation team.",
+      "category": "Utility"
+    },
+    {
+      "name": "/report setchannel",
+      "description": "Set the channel where user reports are sent. (Manage Server required)",
+      "category": "Utility"
+    },
+    {
+      "name": "/serverinfo",
+      "description": "Get detailed information about the server",
+      "category": "Utility"
+    },
+    {
+      "name": "/stats",
+      "description": "View bot statistics",
+      "category": "Core"
+    },
+    {
+      "name": "/timeout",
+      "description": "Timeout a user for a specific duration.",
+      "category": "Moderation"
+    },
+    {
+      "name": "/unban",
+      "description": "Unban a user from the server",
+      "category": "Moderation"
+    },
+    {
+      "name": "/unlock",
+      "description": "Unlocks the current channel (allows @everyone to send messages again).",
+      "category": "Moderation"
+    },
+    {
+      "name": "/untimeout",
+      "description": "Remove timeout from a user",
+      "category": "Moderation"
+    },
+    {
+      "name": "/userinfo",
+      "description": "Get detailed information about a user",
+      "category": "Utility"
+    },
+    {
+      "name": "/warn",
+      "description": "Warn a user",
+      "category": "Moderation"
+    },
+    {
+      "name": "/warnings",
+      "description": "View all warnings for a user",
+      "category": "Moderation"
+    },
+    {
+      "name": "/welcome",
+      "description": "Configure the welcome system",
+      "category": "Welcome"
+    },
+    {
+      "name": "/welcome setup",
+      "description": "Set up the welcome message",
+      "category": "Welcome"
+    }
+  ]
+}

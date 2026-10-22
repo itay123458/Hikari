@@ -16,3 +16,6 @@ logs
 .DS_Store
 coverage
 .agent-tools
+site
+design
+docs

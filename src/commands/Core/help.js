@@ -10,6 +10,7 @@ import {
     createSelectMenu,
 } from "../../utils/components.js";
 import { logger } from '../../utils/logger.js';
+import { INVITE_URL, SOURCE_URL, DASHBOARD_URL } from '../../config/publicLinks.js';
 
 const CATEGORY_SELECT_ID = "help-category-select";
 const ALL_COMMANDS_ID = "help-all-commands";
@@ -113,6 +114,9 @@ export async function createInitialHelpMenu(client) {
 
     const buttonRow = new ActionRowBuilder().addComponents([
         bugReportButton,
+        new ButtonBuilder().setLabel('Invite Hikari').setStyle(ButtonStyle.Link).setURL(INVITE_URL),
+        new ButtonBuilder().setLabel('Hikari Source').setStyle(ButtonStyle.Link).setURL(SOURCE_URL),
+        new ButtonBuilder().setLabel('Bot Hub').setStyle(ButtonStyle.Link).setURL(DASHBOARD_URL),
     ]);
 
     return {

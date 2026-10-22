@@ -5,6 +5,7 @@
   "main": "src/app.js",
   "type": "module",
   "scripts": {
+    "build:site": "node scripts/build-site.js",
     "test": "node scripts/test.js",
     "check": "node scripts/check.js",
     "anime:smoke": "node scripts/anime-smoke.js",

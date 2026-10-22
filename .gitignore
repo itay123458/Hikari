@@ -144,3 +144,5 @@ dist
 # Database backup artifacts
 backups/
 *.dump
+*.blend1
+.playwright-cli/
