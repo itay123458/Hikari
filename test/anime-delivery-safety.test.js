@@ -10,6 +10,17 @@ import { join } from 'node:path';
 import { PGlite } from '@electric-sql/pglite';
 import { animeTableStatements } from '../src/services/anime/schema.js';
 
+test('late uncertain recovery cannot downgrade a confirmed receipt', async t => {
+  const store = await testStore(t);
+  const job = await store.enqueue('monotonic-receipt', 'episode', {}, new Date());
+  await store.beginDelivery(job, 'channel');
+  await store.receipt(job.id, 'confirmed', 'sent');
+  await store.receipt(job.id, null, 'uncertain');
+  const receipt = await store.delivery(job.id);
+  assert.equal(receipt.state, 'sent');
+  assert.equal(receipt.message_id, 'confirmed');
+});
+
 for (const mutation of ['finish', 'defer', 'retry']) test(`reclaimed attempts reject stale ${mutation}`, async t => {
   const store = await testStore(t), now = new Date();
   await store.enqueue(mutation, 'episode', {}, now);

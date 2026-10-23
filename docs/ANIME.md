@@ -307,3 +307,10 @@ actual-air-type fallback, exact seasons, partial dates, shared source dedupe,
 recurring reschedules, changed preferences, guild moves, attempt fencing and
 disk-backed restart/nonce recovery. Live provider checks depend on provider
 connectivity and credentials; fixture tests never imply regional watchability.
+
+Stage 2 validation on 2026-10-23: **107 tests passed, zero skips**, including
+real PostgreSQL 18 concurrent claims/locking and intent visibility; **326
+JavaScript files** passed syntax checks. Migration apply was repeated against
+a disposable database and the schema-version check passed. Node 20.19.0 ran
+the complete final suite; Node 22.16.0 also passed the 105-test suite before the
+last two receipt/snapshot regression tests were added.

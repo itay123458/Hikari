@@ -116,7 +116,7 @@ export class AnimePlanner {
       const key = `${event.type}:${event.episode}`;
       const state = { at: event.at, delay: event.delay ?? null, delayedUntil: event.delayedUntil ?? null, status: event.status ?? null, episodeStart: event.episodeStart ?? event.episode };
       const before = old[key];
-      const changed = before && Object.keys(state).some(field => (before[field] ?? null) !== (state[field] ?? null));
+      const changed = before && Object.keys(state).some(field => (before[field] !== undefined || ['at', 'delay'].includes(field)) && (before[field] ?? null) !== (state[field] ?? null));
       const revision = (before?.revision || 0) + (changed ? 1 : 0);
       next[key] = { ...state, revision, seenAt: this.now().toISOString() };
       if (changed && follow.changes !== false) {

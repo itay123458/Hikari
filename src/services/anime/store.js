@@ -124,7 +124,7 @@ export class AnimeStore {
   }
 
   async receipt(id, messageId, state = 'sent') {
-    await this.pool.query('UPDATE anime_deliveries SET state=$3,message_id=$2 WHERE job_id=$1', [id, messageId, state]);
+    await this.pool.query("UPDATE anime_deliveries SET state=$3,message_id=$2 WHERE job_id=$1 AND (state<>'sent' OR $3='sent')", [id, messageId, state]);
   }
 
   async eraseUser(userId) {

@@ -13,6 +13,14 @@ test('restart catch-up includes the previous UTC week on Monday', async () => {
   assert.ok(requested.some(d => d.startsWith('2026-10-25')));
 });
 
+test('legacy snapshots acquire new metadata without announcing a false schedule change', async t => {
+  const store = await testStore(t), planner = new AnimePlanner({}, { store }, () => new Date('2026-10-23T12:00:00Z'));
+  const at = '2026-10-24T12:00:00Z';
+  await store.mutate('schedule-snapshot', 'guild-g:1', () => ({ 'sub:2': { at, delay: null } }));
+  await planner.commitFollow(store, 'g', { malId: 1, type: 'sub', episodes: false }, [{ type: 'sub', episode: 2, at, delay: null, status: 'Ongoing' }], null);
+  assert.equal((await store.pool.query('SELECT count(*) n FROM anime_jobs')).rows[0].n, 0);
+});
+
 test('schedule changes retain absent delayed episodes and repeated transitions have distinct jobs', async t => {
   const store = await testStore(t), now = new Date('2026-10-23T12:00:00Z');
   const planner = new AnimePlanner({}, { store }, () => now);
