@@ -2,6 +2,15 @@
 require __DIR__.'/bridge.php';
 set_error_handler(function($severity,$message){throw new RuntimeException($message);});
 function check($ok, $message) { if (!$ok) throw new Exception($message); }
+$sourceTrailer=['youtube_id'=>null,'url'=>null,'embed_url'=>'https://www.youtube-nocookie.com/embed/gY5nDXOtv_o?enablejsapi=1','images'=>['image_url'=>null]];
+$fixedTrailer=bridgeTrailer($sourceTrailer);
+check($fixedTrailer['youtube_id']==='gY5nDXOtv_o','trailer source ID');
+check($fixedTrailer['url']==='https://www.youtube.com/watch?v=gY5nDXOtv_o','trailer canonical URL');
+check($fixedTrailer['images']===['image_url'=>null],'unknown trailer images changed');
+foreach (['https://evil.example/embed/gY5nDXOtv_o','https://www.youtube-nocookie.com/embed/gY5nDXOtv_oEXTRA','https://www.youtube-nocookie.com/embed/short','https://www.youtube-nocookie.com.evil.example/embed/gY5nDXOtv_o'] as $embed) {
+    $unknown=['youtube_id'=>null,'url'=>null,'embed_url'=>$embed];
+    check(bridgeTrailer($unknown)===$unknown,'unrecognized embed inferred a trailer');
+}
 $fetch = function($page) { return ['rows'=>array_map(fn($id)=>['mal_id'=>$id], range(($page-1)*50+1,$page*50)), 'next'=>$page<3]; };
 foreach ([1,5,6,10,11,15] as $page) {
     $r = bridgePage($fetch,$page,10);

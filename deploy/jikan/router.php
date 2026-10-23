@@ -50,11 +50,7 @@ function animeDetail(int $id): array {
     $row['streaming']=$row['streaming_links']??[];
     $row['external']=$row['external_links']??[];
     $row['theme']=['openings'=>$row['opening_themes']??[],'endings'=>$row['ending_themes']??[]];
-    // The parser currently misses youtube_id for MAL's privacy-enhanced embeds.
-    if (empty($row['trailer']['youtube_id']) && preg_match('~^https://www\.youtube-nocookie\.com/embed/([A-Za-z0-9_-]{11})(?:[?/] |[?]|$)~x',$row['trailer']['embed_url']??'',$m)) {
-        $row['trailer']['youtube_id']=$m[1];
-        $row['trailer']['url']='https://www.youtube.com/watch?v='.$m[1];
-    }
+    $row['trailer']=bridgeTrailer($row['trailer']??[]);
     return $row;
 }
 function searchRoute(string $kind): array {
@@ -108,6 +104,9 @@ function route(string $path): array {
             'news'=>['getNewsList',Jikan\Request\Anime\AnimeNewsRequest::class],
             'videos'=>['getAnimeVideos',Jikan\Request\Anime\AnimeVideosRequest::class]][$part];
         $data=upstream($spec[0],new $spec[1]($id),fn($model)=>serial($part==='characters'?$model->getCharacters():($part==='news'?$model->getResults():$model)));
+        if ($part==='videos') foreach ($data['promo']??[] as $index=>$promo) {
+            $data['promo'][$index]['trailer']=bridgeTrailer($promo['trailer']??[]);
+        }
         return ['data'=>$data];
     }
     if (preg_match('~^/v4/(characters|people)/([1-9][0-9]{0,8})(?:/full)?$~D',$path,$m)) {

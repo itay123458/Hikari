@@ -11,6 +11,7 @@ foreach($routes as $route) {
     if ($route==='anime/1/full') $ok=$ok&&($data['mal_id']??null)===1&&isset($data['aired']['prop']['from']['year'])&&isset($data['images']['jpg']['image_url']);
     if ($route==='anime/1/full') $ok=$ok&&($data['aired']['prop']['from']??null)===['day'=>3,'month'=>4,'year'=>1998]&&str_starts_with($data['url']??'','https://myanimelist.net/anime/1/')&&preg_match('~^https://www.youtube.com/watch\?v=[A-Za-z0-9_-]{11}$~',$data['trailer']['url']??'');
     if ($route==='anime/1/relations') $ok=$ok&&isset($data[0]['relation'],$data[0]['entry'][0]['mal_id'],$data[0]['entry'][0]['type'],$data[0]['entry'][0]['url']);
+    if ($route==='anime/1/videos') $ok=$ok&&preg_match('~^https://www.youtube.com/watch\?v=[A-Za-z0-9_-]{11}$~',$data['promo'][0]['trailer']['url']??'');
     if ($route==='people/14/full') $ok=$ok&&!empty($data['voices'][0]['character']['name'])&&!empty($data['voices'][0]['anime']['title']);
     if ($route==='characters/1/full') $ok=$ok&&!empty($data['voices'][0]['person']['name']);
     if (str_contains($route,'/news')) $ok=$ok&&isset($data[0]['mal_id'],$data[0]['url'],$data[0]['date'],$data[0]['excerpt']);

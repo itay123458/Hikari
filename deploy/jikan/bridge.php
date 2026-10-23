@@ -7,6 +7,16 @@ function bridgeRemaining(float $wait=0): float {
     return $remaining;
 }
 
+function bridgeTrailer(array $trailer): array {
+    // MAL's official parser currently misses privacy-enhanced embed IDs. Only
+    // recover the exact source ID; leave absent artwork and other fields alone.
+    if (empty($trailer['youtube_id']) && preg_match('~^https://www\.youtube-nocookie\.com/embed/([A-Za-z0-9_-]{11})(?:[?/#]|$)~D',$trailer['embed_url']??'',$match)) {
+        $trailer['youtube_id']=$match[1];
+        $trailer['url']='https://www.youtube.com/watch?v='.$match[1];
+    }
+    return $trailer;
+}
+
 // MAL search pages contain 50 results; the client asks for ten. Slice only
 // after merging/filtering upstream pages so page two never skips forty titles.
 function bridgePage(callable $fetch, int $page, int $limit, ?callable $filter=null): array {
