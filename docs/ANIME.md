@@ -314,3 +314,12 @@ JavaScript files** passed syntax checks. Migration apply was repeated against
 a disposable database and the schema-version check passed. Node 20.19.0 ran
 the complete final suite; Node 22.16.0 also passed the 105-test suite before the
 last two receipt/snapshot regression tests were added.
+
+The verified implementation was deployed to the Pi with a private database
+backup and rollback image. Discord confirmed 29 registered commands including
+`admin weekly` and `admin preview`; readiness reported persistent PostgreSQL.
+The authenticated AnimeSchedule check returned 276 current entries across
+raw/sub/dub and an exact MAL-ID mapping. Other Pi containers retained their IDs.
+Live Jikan requests from the Pi timed out at the network layer (`ETIMEDOUT`),
+so live Jikan discovery/news verification is unavailable until connectivity
+recovers; its documented response handling is covered by regression tests.

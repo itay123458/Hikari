@@ -22,7 +22,7 @@
 - [x] Settings/commands/local schedules: tests first; configurable weekly weekday/time/type; DST-safe UTC occurrence; followed-only today/week schedules; per-follow episode/change preferences; administrator previews and feed filters.
 - [x] Delivery persistence: tests first; attempt-fenced state mutations and delivery ownership; safe retry of transient pre-send errors; cancellation/guild/type checks; restart catch-up bounds.
 - [x] Integration: planner weekly scheduling and worker rendering use the shared helpers; preserve old commands; update README/.env.example and generated command catalogue.
-- [ ] Verification: syntax and full tests, fresh code review, resolve findings, commit/push, CI and Pi deployment with health/provider smoke checks.
+- [x] Verification: syntax and full tests, fresh code review, resolve findings, commit/push, CI and Pi deployment with health/provider smoke checks. All 107 tests pass; Pi Discord/AnimeSchedule checks pass. Jikan live requests time out (documented external limitation).
 
 ## Review focus
 
