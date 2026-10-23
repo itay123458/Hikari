@@ -1,6 +1,8 @@
 import { createHash } from 'node:crypto';
 import { localDate, localTime, isoWeek, validateSettings } from './domain.js';
-import { resolveMapping, safeUrl } from './providers.js';
+import { resolveMapping } from './providers.js';
+import { reconcileFeeds } from './feeds.js';
+import { weeklyOccurrence } from './schedules.js';
 import { logger } from '../../utils/logger.js';
 import { calendarDay } from './conversation.js';
 
@@ -13,7 +15,9 @@ export class AnimePlanner {
     const now = this.now();
     const current = await this.ctx.schedule.timetable('all', now);
     const next = await this.ctx.schedule.timetable('all', new Date(+now + 7 * 86400000));
-    const unique = new Map([...current, ...next].map(e => [`${e.route}:${e.type}:${e.episode}:${e.at}`, e]));
+    const lookback = new Date(+now - 86400000);
+    const previous = JSON.stringify(isoWeek(lookback)) !== JSON.stringify(isoWeek(now)) ? await this.ctx.schedule.timetable('all', lookback) : [];
+    const unique = new Map([...previous, ...current, ...next].map(e => [`${e.route}:${e.type}:${e.episode}`, e]));
     return [...unique.values()];
   }
   async reconcile() {
@@ -36,9 +40,9 @@ export class AnimePlanner {
               await this.feeds(guild.id, follow, settings);
             } catch { logger.warn('Anime follow scan deferred', { event: 'anime.follow.scan_failed', guildId: guild.id, malId: follow.malId }); }
           }
-          if (settings.weekly && settings.scheduleChannel && localTime(now, settings.timezone) >= '09:00') {
-            const week = isoWeek(now);
-            await store.enqueue(`weekly:${guild.id}:${week.year}:${week.week}`, 'weekly', { guildId: guild.id, ...week }, now);
+          if (settings.weekly && settings.scheduleChannel) {
+            const occurrence = weeklyOccurrence(now, settings);
+            if (+now - Date.parse(occurrence.at) < 86400000) await store.enqueue(`weekly:${guild.id}:${occurrence.at}`, 'weekly', { guildId: guild.id, ...occurrence, weeklyDay: settings.weeklyDay, weeklyTime: settings.weeklyTime, timezone: settings.timezone, createdAt: occurrence.at }, new Date(occurrence.at));
           }
         }
         if (settings.modules.includes('community') && settings.notifications) {
@@ -103,47 +107,30 @@ export class AnimePlanner {
     const target = userId ? `user-${userId}` : `guild-${guildId}`;
     const events = timetable.filter(e => follow.type === 'all' || follow.type === e.type);
     const snapshotId = `${target}:${follow.malId}`;
-    const old = await store.read('schedule-snapshot', snapshotId, {}), next = {};
+    const old = await store.read('schedule-snapshot', snapshotId, {});
+    // Preserve delayed/unknown entries that disappear from the provider horizon,
+    // while bounding historical snapshot growth separately from delivery keys.
+    const next = Object.fromEntries(Object.entries(old).filter(([, value]) => !value.seenAt || Date.parse(value.seenAt) >= +this.now() - 90 * 86400000).slice(-500));
     for (const event of events) {
       if (!event.episode || event.type === 'unknown') continue;
       const key = `${event.type}:${event.episode}`;
-      next[key] = { at: event.at, delay: event.delay };
-      if (old[key] && (old[key].at !== event.at || old[key].delay !== event.delay)) {
-        const payload = { guildId, userId, malId: follow.malId, title: event.title, type: event.type, episode: event.episode, at: event.at, delay: event.delay, source: event.source, roleId: follow.roleId, update: true };
-        await store.enqueue(`schedule-change:${snapshotId}:${key}:${digest(next[key])}`, 'update', payload, this.now());
+      const state = { at: event.at, delay: event.delay ?? null, delayedUntil: event.delayedUntil ?? null, status: event.status ?? null, episodeStart: event.episodeStart ?? event.episode };
+      const before = old[key];
+      const changed = before && Object.keys(state).some(field => (before[field] ?? null) !== (state[field] ?? null));
+      const revision = (before?.revision || 0) + (changed ? 1 : 0);
+      next[key] = { ...state, revision, seenAt: this.now().toISOString() };
+      if (changed && follow.changes !== false) {
+        const payload = { guildId, userId, malId: follow.malId, sinceAt: follow.sinceAt, title: event.title, type: event.type, episode: event.episode, ...state, source: event.source, roleId: follow.roleId, update: true, createdAt: this.now().toISOString() };
+        await store.enqueue(`schedule-change:${snapshotId}:${key}:${revision}`, 'update', payload, this.now());
       }
-      if (event.at && !event.delay && Date.parse(event.at) >= Date.parse(follow.sinceAt || this.now().toISOString()) && Date.parse(event.at) >= +this.now() - 86400000) {
-        await store.schedule(episodeKey(target, follow.malId, event), 'episode', { guildId, userId, malId: follow.malId, type: event.type, episode: event.episode }, new Date(event.at));
+      if (follow.episodes !== false && event.at && !event.delay && Date.parse(event.at) >= Date.parse(follow.sinceAt || this.now().toISOString()) && Date.parse(event.at) >= +this.now() - 86400000) {
+        await store.schedule(episodeKey(target, follow.malId, event), 'episode', { guildId, userId, malId: follow.malId, sinceAt: follow.sinceAt, type: event.type, episode: event.episode }, new Date(event.at));
       }
     }
     await store.mutate('schedule-snapshot', snapshotId, () => next);
   }
   async feeds(guildId, follow, settings) {
-    const { jikan, store } = this.ctx;
-    const key = `${guildId}:${follow.malId}`, old = await store.read('feed-snapshot', key);
-    const anime = await jikan.anime(follow.malId);
-    const relations = (anime.relations || []).flatMap(r => (r.entry || []).filter(e => e.type === 'anime').map(e => ({ ...e, relation: r.relation })));
-    const news = settings.news ? await jikan.resource(follow.malId, 'news') : [];
-    const videos = settings.trailers ? await jikan.resource(follow.malId, 'videos') : null;
-    const trailers = videos?.promo || [];
-    const snapshot = { relations: relations.map(r => r.mal_id), status: anime.status, news: settings.news ? (news || []).map(n => n.mal_id) : null, trailers: settings.trailers ? trailers.map(p => p.trailer?.youtube_id || p.trailer?.url).filter(Boolean) : null };
-    if (old) {
-      for (const relation of relations.filter(r => !old.relations.includes(r.mal_id))) {
-        const related = await jikan.anime(relation.mal_id);
-        await this.feed(guildId, follow, `relation:${relation.mal_id}`, `Related ${related.type || 'anime'} listed: ${related.title}`, `MAL now lists this as ${relation.relation}. Release date and chronology remain as reported by the source.`, `https://myanimelist.net/anime/${relation.mal_id}`, 'relation');
-      }
-      if (old.status && old.status !== anime.status) await this.feed(guildId, follow, `status:${anime.status}`, `${anime.title} · status update`, `Provider status changed from ${old.status} to ${anime.status || 'unknown'}.`, `https://myanimelist.net/anime/${follow.malId}`, 'relation');
-      if (old.news) for (const item of (news || []).filter(n => !old.news.includes(n.mal_id))) {
-        if (item.date && Date.parse(item.date) < Date.parse(follow.sinceAt)) continue;
-        await this.feed(guildId, follow, `news:${item.mal_id}`, item.title, 'New source article for a followed anime. The linked article may contain spoilers.', safeUrl(item.url), 'news');
-      }
-      if (old.trailers) for (const trailer of trailers.filter(p => !old.trailers.includes(p.trailer?.youtube_id || p.trailer?.url))) await this.feed(guildId, follow, `trailer:${trailer.trailer?.youtube_id || digest(trailer)}`, `${anime.title} · ${trailer.title || 'Trailer'}`, 'New promotional video listed by MAL. Trailers may contain spoilers.', safeUrl(trailer.trailer?.url, ['youtube.com', 'youtu.be']), 'trailers');
-    }
-    await store.mutate('feed-snapshot', key, () => snapshot);
-  }
-  async feed(guildId, follow, key, title, description, source, feedType) {
-    if (!source) return;
-    await this.ctx.store.enqueue(`feed:${guildId}:${follow.malId}:${key}`, 'feed', { guildId, malId: follow.malId, title, description, source, feedType }, this.now());
+    return reconcileFeeds(this.ctx, guildId, follow, settings, this.now());
   }
   async parties(guildId) {
     const now = this.now();

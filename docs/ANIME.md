@@ -6,7 +6,8 @@ form the [29-command active catalogue](COMMANDS.md). Unrelated legacy commands
 are not loaded or registered; their stored data is preserved. Health endpoints
 and Docker deployment remain present. Anime commands are slash-only and use one
 global command, `/anime`, with Hikari's lavender theme and command loader.
-There is no separate web dashboard or new authentication system.
+The public GitHub Pages hub provides invites, features and command search;
+server settings remain administrator commands inside Discord.
 
 ## Operator setup
 
@@ -28,6 +29,12 @@ There is no separate web dashboard or new authentication system.
 6. Approve optional mention roles with `/anime admin roles`. Then follow an
    anime with `/anime alerts follow server:true` and optionally select an
    approved role. Enable weekly/news/trailer posts with `/anime admin feeds`.
+   Configure the weekly local weekday, time, release track and optional IANA
+   override with `/anime admin weekly enabled:true day:1 time:09:00
+   timezone:Asia/Jerusalem`. Days use 0=Sunday through 6=Saturday. A nonexistent
+   DST wall time moves to the first valid minute; a repeated time uses its first
+   occurrence. `/anime admin preview` privately renders the followed weekly
+   schedule without posting, creating delivery jobs, or pinging any roles.
 7. For optional conversation starters, choose a text channel with
    `/anime admin channels conversation:#anime-chat`, then set
    `/anime admin feeds prompt-days:2` for every other day. Use `1` for daily,
@@ -80,7 +87,7 @@ Open `/anime help` for a compact guide. Discord exposes all options and choices.
 | `club` | `hub`, `refresh` | Persistent anime hub with public ratings, schedule, provider links, personal actions and discussion links |
 | `games` | `guess`, `answer`, `reveal` | Real provider titles/covers, clue, silhouette-mask and progressively unblurred cover games; stored results and short guess cooldown |
 | `games` | `tournament`, `bracket`, `advance` | Persistent 4/8/16-character brackets and per-match votes; host/manager closes each match; ties advance the earlier seed |
-| `admin` | `settings`, `channels`, `roles`, `modules`, `mapping`, `chronology`, `feeds` | Existing guild configuration and explicit identity/order verification |
+| `admin` | `settings`, `channels`, `roles`, `modules`, `mapping`, `chronology`, `feeds`, `weekly`, `preview` | Guild configuration, local weekly timing, safe previews and explicit identity/order verification |
 
 `preferences`/search genre filters use MAL numeric genre IDs (for example Action
 is 1); preferences validate IDs against Jikan's genre list. Statuses are
@@ -152,10 +159,32 @@ Schedules distinguish Japanese broadcast, subtitle and dub times. Notifications
 say **scheduled time reached**, not “published on Crunchyroll.” Delay/reschedule
 jobs recheck the current provider record before delivery. Related sequel,
 movie/new-anime and status updates come from changes to followed titles' MAL
-relations/status. News and trailers cover **server-followed anime**. First feed
+relations/status. Existing related seasons and movies are also checked for new
+or changed premiere dates. Jikan's structured year/month/day fields determine
+date precision: a year or month is displayed at that precision; unknown dates
+remain unknown rather than accepting a placeholder January 1.
+News and trailers cover **server-followed anime**. First feed
 scan establishes a baseline instead of announcing old articles and relations.
-Weekly posts show the first 10 entries with a link and paged command for the full
-week. Provider outages never create guessed dates, mappings or availability.
+Article catch-up is limited to dated items within 24 hours. Jikan news supplies
+no reliable article category, so articles are explicitly unclassified news;
+the bot never guesses that an article is a delay or an announcement. Trailer
+publication dates are not supplied and remain unknown. `/anime admin feeds
+categories:news,trailers,sequels,dates,status` filters the actual resource/change
+types; use `all` or `none` to reset. Delays and reschedules come from structured
+AnimeSchedule data, controlled by each follow's `changes` preference.
+
+`/anime alerts follow` accepts `episodes` and `changes` preferences (both default
+true); run it again to replace those preferences. Personal follows explicitly
+opt into DMs and remain associated with the guild where they were created.
+`/anime alerts schedule` defaults to server follows; `scope:personal` shows the
+invoking member's follows in this guild and `scope:all` preserves the general
+provider timetable. Today and week use the guild's local dates, Monday through
+Sunday for the week. Unknown times cannot be attributed to a day/week and are
+excluded with an explanation; countdowns can show an unknown upcoming time.
+Weekly posts contain only server-followed anime, show the first 10 entries and
+point to the paged command. Provider outages never create guessed dates,
+mappings or availability. A subtitle fallback is labeled with the actual
+Japanese broadcast type and the requested subtitle type.
 
 ## Persistence, privacy and operations
 
@@ -204,13 +233,39 @@ retry with backoff up to eight attempts where retry is safe. Deleted channels,
 missing permissions and blocked DMs have terminal states; personal DM content
 is never posted publicly as a fallback.
 
+Episodes, schedule updates, feed deliveries and weekly posts have a 24-hour
+catch-up bound. Monday restart scans include the prior UTC week when the bound
+crosses the week boundary. Missed older jobs are canceled. Snapshot retention
+keeps absent delayed episodes for up to 90 days (bounded to 500 entries per
+subscription); delivery keys remain persistent. Schedule-change revisions let
+repeated A→B→A→B changes produce distinct updates. Source URLs/video identities
+deduplicate shared news/trailers across multiple followed anime in one guild.
+Queued jobs recheck subscription generation, guild, release track and current
+preferences. State transitions and delivery-intent insertion are fenced by the
+claimed attempt, so an expired worker cannot overwrite a newer claim.
+After provider/channel/member lookups, delivery admission checks the current
+subscription under its profile/guild lock and commits the delivery intent
+before calling Discord. Unsubscribe or preference changes that commit before
+admission prevent delivery; an already admitted send may still finish.
+
 Discord and PostgreSQL cannot share a transaction. Before sending, the bot
 saves a delivery intent and uses a stable Discord nonce. Saved receipts prevent
 repeated sends after restart. A crashed/ambiguous send is reconciled against the
 last 100 channel messages; if its receipt cannot be proven, it is held as
 `uncertain`, not automatically sent again. This favors duplicate suppression
 over automatic recovery of potentially lost notifications; it is not a claim
-of unconditional exactly-once delivery. Inspect safely without personal payloads:
+of unconditional exactly-once delivery.
+
+There is still an unavoidable interval after the intent is saved and before
+Discord finishes sending: a cancellation cannot recall a send already underway.
+A crash before the send can leave an omitted notification held as uncertain.
+History retention/visibility and Discord's nonce enforcement are not permanent
+proofs. Automatic recovery therefore never blindly resends an uncertain job;
+manual requeueing or deleting receipts can cause duplicates. Transient errors
+before creating an intent are safe to retry; blocked DMs and definitive missing
+channel/permission errors are terminal.
+
+Inspect safely without personal payloads:
 
 ```sql
 SELECT id, kind, state, attempts, last_error
@@ -247,13 +302,8 @@ tests plus the existing migration checks. No test logs in to Discord.
 
 There is no TypeScript or compiled application build in this project. `check`
 syntax-checks all project JavaScript; tests serialize command/component builders.
-Authenticated Discord and AnimeSchedule end-to-end tests require operator
-credentials. The local live Jikan smoke attempt timed out connecting to the
-provider; live provider behavior remains unverified in this environment. The
-Docker daemon was unavailable, so a local container image build was not run.
-
-Local validation on 2026-10-22: **49/49 tests passed, no skips**, on Node 20.19.0
-and Node 22.16.0, including disposable real PostgreSQL 18 concurrency tests.
-All **310 JavaScript files** passed syntax checks. Repeated migration applies,
-the existing schema-version check and `git diff --check` passed. The temporary
-PostgreSQL server was stopped after testing. No production server was modified.
+Stage 2 regression tests include DST gaps/folds and local-week boundaries,
+actual-air-type fallback, exact seasons, partial dates, shared source dedupe,
+recurring reschedules, changed preferences, guild moves, attempt fencing and
+disk-backed restart/nonce recovery. Live provider checks depend on provider
+connectivity and credentials; fixture tests never imply regional watchability.

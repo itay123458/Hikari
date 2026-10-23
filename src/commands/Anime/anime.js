@@ -39,11 +39,11 @@ const definitions = {
     ['delete', 'Confirm deletion of your anime data across servers', []],
   ],
   alerts: [
-    ['follow', 'Follow release tracks privately or for this server', [anime, type, ['server', 'boolean', 'Post to configured server channel (Manage Server)'], ['role', 'role', 'Approved announcement role (server follows only)']]],
+    ['follow', 'Follow release tracks privately or for this server', [anime, type, ['server', 'boolean', 'Post to configured server channel (Manage Server)'], ['role', 'role', 'Approved announcement role (server follows only)'], ['episodes', 'boolean', 'Episode notifications (default true)'], ['changes', 'boolean', 'Delay and metadata changes (default true)']]],
     ['unfollow', 'Stop following an anime', [anime, ['server', 'boolean', 'Remove server follow (Manage Server)']]],
     ['following', 'View your private or server follows', [['server', 'boolean', 'View server follows']]],
     ['countdown', 'Next mapped episode time, preserving release type', [anime, type]],
-    ['schedule', 'Today or weekly AnimeSchedule timetable', [['period', 'string', 'Schedule period', false, ['today', 'week']], type, ['stream', 'string', 'Provider-listed streaming filter', false, ['crunchyroll']]]],
+    ['schedule', 'Today or weekly AnimeSchedule timetable', [['period', 'string', 'Schedule period', false, ['today', 'week']], ['scope', 'string', 'Followed subscriptions or general timetable', false, ['server', 'personal', 'all']], type, ['stream', 'string', 'Provider-listed streaming filter', false, ['crunchyroll']]]],
   ],
   club: [
     ['review', 'Explicitly publish an episode-context review', [anime, episode, ['rating', 'integer', 'Public review rating', true, [1, 10]], ['spoiler', 'boolean', 'Hide review behind a private warning (default true)']]],
@@ -67,13 +67,15 @@ const definitions = {
     ['advance', 'Close current match and advance your tournament', [id]],
   ],
   admin: [
+    ['weekly', 'Configure local weekly followed schedule delivery', [['enabled', 'boolean', 'Enable weekly posts'], ['day', 'integer', 'Weekday: 0 Sunday through 6 Saturday', false, [0, 6]], ['time', 'string', 'Local HH:mm (default 09:00)'], ['timezone', 'string', 'IANA zone; defaults to server timezone'], type]],
+    ['preview', 'Private weekly notification preview without sending or pinging', []],
     ['settings', 'Show or update anime preferences (Manage Server)', [['enabled', 'boolean', 'Enable anime modules'], ['timezone', 'string', 'IANA time zone; default Asia/Jerusalem'], ['language', 'string', 'Title language', false, ['english', 'romaji', 'japanese']], ['spoilers', 'boolean', 'Hide synopsis by default'], ['quiet-start', 'string', 'Quiet hours start HH:mm, or off'], ['quiet-end', 'string', 'Quiet hours end HH:mm, or off'], ['notifications', 'boolean', 'Enable scheduled notifications']]],
     ['channels', 'Set anime feeds and conversation channels', [['announcements', 'channel', 'Episode and update channel'], ['news', 'channel', 'News/trailer channel'], ['schedule', 'channel', 'Weekly schedule channel'], ['conversation', 'channel', 'Automatic anime conversation starters']]],
     ['roles', 'Allow or remove a mention role for server follows', [['role', 'role', 'Role that may be mentioned', true], ['approved', 'boolean', 'Whether the role is approved', true]]],
     ['modules', 'Enable/disable a module', [['module', 'string', 'Module', true, ['discovery', 'tracking', 'announcements', 'community', 'games']], ['enabled', 'boolean', 'Enabled', true]]],
     ['mapping', 'Confirm exact MAL-to-AnimeSchedule mapping', [anime, ['slug', 'string', 'Verified AnimeSchedule anime URL slug', true]]],
     ['chronology', 'Save a sourced, verified chronological order', [anime, ['entries', 'string', 'MAL IDs in verified chronological order, comma-separated', true], ['source', 'string', 'Source URL verifying this order', true]]],
-    ['feeds', 'Configure anime feeds and optional conversation starters', [['weekly', 'boolean', 'Automatic weekly timetable'], ['news', 'boolean', 'News for server follows'], ['trailers', 'boolean', 'Trailers for server follows'], ['prompt-days', 'integer', 'Days between conversation starters: 0 off, 1 daily, 2 every other day', false, [0, 7]]]],
+    ['feeds', 'Configure anime feeds and optional conversation starters', [['weekly', 'boolean', 'Automatic weekly timetable'], ['news', 'boolean', 'News for server follows'], ['trailers', 'boolean', 'Trailers for server follows'], ['categories', 'string', 'all, none, or comma-separated news,trailers,sequels,dates,status resource filters'], ['prompt-days', 'integer', 'Days between conversation starters: 0 off, 1 daily, 2 every other day', false, [0, 7]]]],
   ],
 };
 

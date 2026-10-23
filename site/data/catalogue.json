@@ -37,6 +37,11 @@
       "category": "Anime"
     },
     {
+      "name": "/anime admin preview",
+      "description": "Private weekly notification preview without sending or pinging",
+      "category": "Anime"
+    },
+    {
       "name": "/anime admin roles",
       "description": "Allow or remove a mention role for server follows",
       "category": "Anime"
@@ -44,6 +49,11 @@
     {
       "name": "/anime admin settings",
       "description": "Show or update anime preferences (Manage Server)",
+      "category": "Anime"
+    },
+    {
+      "name": "/anime admin weekly",
+      "description": "Configure local weekly followed schedule delivery",
       "category": "Anime"
     },
     {

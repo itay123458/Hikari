@@ -73,12 +73,18 @@ export class AnimeStore {
     return rows[0] ?? null;
   }
 
-  async finish(id, state = 'done') {
-    await this.pool.query('UPDATE anime_jobs SET state=$2,lease_until=NULL WHERE id=$1', [id, state]);
+  async finish(job, state = 'done') {
+    const object = typeof job === 'object';
+    await this.pool.query(`UPDATE anime_jobs SET state=$2,lease_until=NULL WHERE id=$1
+      ${object ? "AND attempts=$3 AND (state='running' OR (state='pending' AND attempts=0))" : ''}`,
+    object ? [job.id, state, job.attempts] : [job, state]);
   }
 
-  async defer(id, at) {
-    await this.pool.query("UPDATE anime_jobs SET state='pending',run_at=$2,lease_until=NULL WHERE id=$1", [id, at]);
+  async defer(job, at) {
+    const object = typeof job === 'object';
+    await this.pool.query(`UPDATE anime_jobs SET state='pending',run_at=$2,lease_until=NULL WHERE id=$1
+      ${object ? "AND attempts=$3 AND (state='running' OR (state='pending' AND attempts=0))" : ''}`,
+    object ? [job.id, at, job.attempts] : [job, at]);
   }
 
   async schedule(key, kind, payload, at) {
@@ -95,17 +101,26 @@ export class AnimeStore {
   }
 
   async retry(job, message, at = new Date(Date.now() + Math.min(3600000, 30000 * 2 ** Math.min(job.attempts, 7)))) {
-    await this.pool.query(`UPDATE anime_jobs SET state=$2,run_at=$3,lease_until=NULL,last_error=$4 WHERE id=$1`,
-      [job.id, job.attempts >= 8 ? 'failed' : 'pending', at, String(message).slice(0, 200)]);
+    await this.pool.query(`UPDATE anime_jobs SET state=$2,run_at=$3,lease_until=NULL,last_error=$4 WHERE id=$1
+      AND attempts=$5 AND (state='running' OR (state='pending' AND attempts=0))`,
+      [job.id, job.attempts >= 8 ? 'failed' : 'pending', at, String(message).slice(0, 200), job.attempts]);
   }
 
   async delivery(id) {
     return (await this.pool.query('SELECT * FROM anime_deliveries WHERE job_id=$1', [id])).rows[0] ?? null;
   }
 
-  async beginDelivery(id, channelId) {
-    return (await this.pool.query(`INSERT INTO anime_deliveries(job_id,channel_id,state) VALUES($1,$2,'sending')
-      ON CONFLICT DO NOTHING RETURNING *`, [id, channelId])).rows[0] ?? null;
+  async ownsAttempt(job) {
+    return (await this.pool.query(`SELECT id FROM anime_jobs WHERE id=$1 AND attempts=$2
+      AND (state='running' OR (state='pending' AND attempts=0))`, [job.id, job.attempts])).rows.length > 0;
+  }
+
+  async beginDelivery(job, channelId) {
+    const object = typeof job === 'object';
+    return (await this.pool.query(`INSERT INTO anime_deliveries(job_id,channel_id,state)
+      SELECT id,$2,'sending' FROM anime_jobs WHERE id=$1
+      ${object ? "AND attempts=$3 AND (state='running' OR (state='pending' AND attempts=0))" : "AND state='pending' AND attempts=0"}
+      ON CONFLICT DO NOTHING RETURNING *`, object ? [job.id, channelId, job.attempts] : [job, channelId])).rows[0] ?? null;
   }
 
   async receipt(id, messageId, state = 'sent') {

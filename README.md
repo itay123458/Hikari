@@ -29,7 +29,8 @@ inviting Hikari does not automatically copy it to another server.
 | Discover anime | Search and filter titles, explore seasons, browse character and voice credits, and open provider-listed official streaming links |
 | Track your watching | Keep a private watchlist, record episode progress, rate shows, save episode notes, and view personal statistics |
 | Find your next show | Get suggestions based on recorded preferences/history, compare with consenting members, and pick from your own list |
-| Follow releases | Browse raw/sub/dub schedules, view mapped episode countdowns, and follow releases privately or for the club |
+| Follow releases | Exact-season countdowns, followed-anime today/week schedules, optional DMs, approved role pings, delay/reschedule alerts and configurable local weekly posts |
+| Follow anime news | Source-linked articles, trailers, new related seasons/movies and confirmed premiere-date changes, with filters and persistent duplicate prevention |
 | Watch together | Create watch parties with RSVP, opt-in private reminders, episode discussions, reviews, and anime hubs |
 | Play and vote | Run anime guessing games, character tournaments, and persistent club polls |
 | Keep conversations moving | Post optional, spoiler-free conversation starters at a configurable interval, without mass pings |
@@ -156,6 +157,20 @@ npm start
 Use `/configwizard` for server setup and `/anime admin` to select channels,
 modules, title language, time zone, spoiler behavior, and optional feeds.
 
+For episode tracking, set an AnimeSchedule **application bearer token** in
+`ANIMESCHEDULE_TOKEN`. Then configure `/anime admin channels`, approve optional
+mention roles with `/anime admin roles`, and use `/anime alerts follow` with
+`server:true` for club announcements or `server:false` for opt-in private DMs.
+The `episodes` and `changes` options control notification preferences.
+
+`/anime admin weekly` sets the local weekday/time and release track. The default
+zone is `Asia/Jerusalem`, including daylight-saving changes; other IANA zones
+are supported. `/anime admin preview` shows a private preview without pings.
+`/anime alerts schedule` shows server follows by default; select `scope:personal`
+for your own follows or `scope:all` for the public timetable. Feed filters live
+in `/anime admin feeds`. See the [anime guide](docs/ANIME.md) for setup examples,
+date precision, restart catch-up and the remaining Discord delivery crash window.
+
 For the isolated Docker deployment, use the
 [Raspberry Pi deployment guide](docs/DEPLOYMENT-PI.md). The `/health` and `/ready`
 endpoints report service and persistent-database readiness.
@@ -165,6 +180,9 @@ endpoints report service and persistent-database readiness.
 **Jikan v4** supplies MyAnimeList metadata and needs no API key.
 **AnimeSchedule** supplies release schedules and needs an application token.
 Provider availability and rate limits can affect features.
+Discovery and Jikan news continue working without the scheduling token. Jikan
+articles remain unclassified because its news API does not supply reliable
+categories; trailer, relation, date and status filters use structured resources.
 
 Crunchyroll integration opens provider-listed official links. Hikari does not
 sign into Crunchyroll, confirm regional availability/languages, or guarantee
@@ -192,7 +210,7 @@ those upstream license notices.
 ## Public hub development
 
 Run `npm ci` and `npm run build:site`, then serve the `site/` directory with a
-static HTTP server. The build derives its 29-command, 107-entry catalogue from
+static HTTP server. The build derives its 29-command, 109-entry catalogue from
 the active command loader and copies only public names, descriptions, categories,
 and links. No bot login or secrets are needed to build the hub.
 

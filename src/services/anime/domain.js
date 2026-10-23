@@ -21,6 +21,10 @@ export const AnimeSettingsSchema = z.object({
   quietEnd: clock.nullable().default(null),
   notifications: z.boolean().default(true),
   weekly: z.boolean().default(false),
+  weeklyDay: z.number().int().min(0).max(6).default(1),
+  weeklyTime: clock.default('09:00'),
+  weeklyType: z.enum(['all', 'raw', 'sub', 'dub']).default('all'),
+  feedCategories: z.array(z.enum(['news', 'trailers', 'sequels', 'dates', 'status'])).default(['news', 'trailers', 'sequels', 'dates', 'status']),
   news: z.boolean().default(false),
   trailers: z.boolean().default(false),
 });

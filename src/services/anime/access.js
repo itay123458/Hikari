@@ -27,9 +27,9 @@ export async function guard(interaction, client, module, { admin = false, action
   return { member, config, settings };
 }
 export async function sendableChannel(guild, channelId, permissions = []) {
-  const channel = await guild.channels.fetch(channelId).catch(() => null);
-  if (!channel || !channel.isTextBased() || channel.isDMBased() || !channel.send) throw new Error('Choose an existing server text channel.');
+  const channel = await guild.channels.fetch(channelId);
+  if (!channel || !channel.isTextBased() || channel.isDMBased() || !channel.send) throw Object.assign(new Error('Choose an existing server text channel.'), { code: 'ANIME_CHANNEL_INVALID' });
   const me = await guild.members.fetchMe();
-  if (!channel.permissionsFor(me)?.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks, ...permissions])) throw new Error('The bot needs View Channel, Send Messages, Embed Links and any requested thread permissions in that channel.');
+  if (!channel.permissionsFor(me)?.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks, ...permissions])) throw Object.assign(new Error('The bot needs View Channel, Send Messages, Embed Links and any requested thread permissions in that channel.'), { code: 'ANIME_CHANNEL_PERMISSIONS' });
   return channel;
 }

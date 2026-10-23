@@ -19,7 +19,7 @@ export const HELP = [
   '**Schedules:** /anime alerts follow, unfollow, following, countdown, schedule',
   '**Community:** /anime club review, reviews, favorites, poll, party, parties, cancel, reschedule, discuss, hub, refresh',
   '**Games:** /anime games guess, answer, reveal, tournament, bracket, advance',
-  '**Administrators:** /anime admin settings, channels, roles, modules, mapping, chronology, feeds',
+  '**Administrators:** /anime admin settings, channels, roles, modules, mapping, chronology, feeds, weekly, preview',
   '\nPersonal responses and notes are private. Shared suggestions and comparisons require both members’ current consent. Reviews are public contributions whose text is revealed privately; ordinary threads cannot enforce per-member spoiler access.',
   '\n[Jikan v4](https://jikan.moe) supplies MAL metadata. [AnimeSchedule.net](https://animeschedule.net) supplies raw/sub/dub schedules and needs an application token. Crunchyroll uses provider-listed links; regions, languages and actual publication remain unknown.',
 ].join('\n\n');

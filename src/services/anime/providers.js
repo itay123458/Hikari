@@ -64,14 +64,25 @@ export function knownDate(value) {
   const date = new Date(value);
   return Number.isNaN(+date) ? null : date.toISOString();
 }
+// Jikan ISO strings can contain default month/day values for partial dates.
+// Only the structured prop fields establish release precision.
+export function releaseDate(aired) {
+  const part = aired?.prop?.from;
+  if (!Number.isInteger(part?.year) || part.year < 1) return { precision: 'unknown', value: null };
+  const year = String(part.year).padStart(4, '0');
+  if (!Number.isInteger(part.month) || part.month < 1 || part.month > 12) return { precision: 'year', value: year };
+  const month = `${year}-${String(part.month).padStart(2, '0')}`;
+  if (!Number.isInteger(part.day) || part.day < 1 || part.day > new Date(Date.UTC(part.year, part.month, 0)).getUTCDate()) return { precision: 'month', value: month };
+  return { precision: 'day', value: `${month}-${String(part.day).padStart(2, '0')}` };
+}
 export function normalizeTimetable(rows) {
   if (!Array.isArray(rows)) throw new ProviderError('AnimeSchedule');
   return rows.map(row => ({
     route: row.route, title: row.title || row.english || row.romaji || 'Unknown title',
     type: ['raw', 'sub', 'dub'].includes(row.airType) ? row.airType : 'unknown',
-    episode: row.episodeNumber || null, at: knownDate(row.episodeDate),
-    delay: row.delayedText || (row.airingStatus === 'delayed-air' ? 'Delayed; new time unknown' : null),
-    delayedUntil: knownDate(row.delayedUntil), status: row.airingStatus || null,
+    episode: row.episodeNumber || null, episodeStart: row.subtractedEpisodeNumber || row.episodeNumber || null, episodeEnd: row.episodeNumber || null, at: knownDate(row.episodeDate),
+    delay: row.delayedText || ((row.status === 'Delayed' || row.airingStatus === 'delayed-air' || knownDate(row.delayedFrom) || knownDate(row.delayedUntil)) ? (knownDate(row.delayedUntil) ? `Delayed until ${knownDate(row.delayedUntil)}` : 'Delayed; new time unknown') : null),
+    delayedFrom: knownDate(row.delayedFrom), delayedUntil: knownDate(row.delayedUntil), status: row.status || row.airingStatus || null,
     streams: streamingLinks(Array.isArray(row.streams) ? row.streams : []),
     publishedOnCrunchyroll: null, region: null,
     source: `https://animeschedule.net/anime/${encodeURIComponent(row.route)}`,

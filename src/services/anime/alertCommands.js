@@ -24,8 +24,8 @@ export async function alertCommand(interaction, ctx, settings, sub, member) {
   if (server && !settings.announcementChannel) throw new Error('Configure an announcement channel with /anime admin channels first.');
   let mapping = null;
   try { mapping = await resolveMapping(ctx.store, ctx.schedule, guildId, id); } catch { /* news follows remain useful without a working schedule provider */ }
-  const follow = { malId: id, title: anime.title, route: mapping?.route || null, type: o.getString('type') || 'all', guildId, roleId: role?.id || null, sinceAt: new Date().toISOString() };
+  const follow = { episodes: o.getBoolean('episodes') !== false, changes: o.getBoolean('changes') !== false, malId: id, title: anime.title, route: mapping?.route || null, type: o.getString('type') || 'all', guildId, roleId: role?.id || null, sinceAt: new Date().toISOString() };
   if (server) await ctx.community.edit(guildId, g => { g.follows[id] = follow; return g; });
   else await ctx.tracking.edit(userId, p => { p.follows[id] = follow; return p; });
-  return message('Anime follow saved', `${server ? 'Announcements will use the configured server channel.' : 'You opted into private episode announcement DMs.'}\n${mapping ? `Exact schedule mapping: ${text(mapping.route)}.` : 'Episode times remain unavailable until a token and exact mapping are available. News and relation updates for server follows can still work.'}\nRaw, sub and dub times are schedules; none confirm Crunchyroll publication.`);
+  return message('Anime follow saved', `${server ? 'Announcements will use the configured server channel.' : 'You opted into private announcement DMs.'}\nEpisode alerts: ${follow.episodes}; change alerts: ${follow.changes}.\n${mapping ? `Exact schedule mapping: ${text(mapping.route)}.` : 'Episode times remain unavailable until a token and exact mapping are available. News and relation updates for server follows can still work.'}\nRaw, sub and dub times are schedules; none confirm Crunchyroll publication.`);
 }
