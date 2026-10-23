@@ -7,8 +7,8 @@ export class ProviderError extends Error {
 }
 
 export class CachedHttp {
-  constructor({ provider = 'Anime provider', interval = 1100, fetcher = fetch, sleep = ms => new Promise(r => setTimeout(r, ms)), now = Date.now, maxEntries = 500 } = {}) {
-    Object.assign(this, { provider, interval, fetcher, sleep, now, maxEntries });
+  constructor({ provider = 'Anime provider', interval = 1100, fetcher = fetch, sleep = ms => new Promise(r => setTimeout(r, ms)), now = Date.now, maxEntries = 500, timeoutMs = 12000 } = {}) {
+    Object.assign(this, { provider, interval, fetcher, sleep, now, maxEntries, timeoutMs });
     this.cache = new Map();
     this.inflight = new Map();
     this.tail = Promise.resolve();
@@ -26,7 +26,7 @@ export class CachedHttp {
         this.nextAt = this.now() + this.interval;
         let response;
         try {
-          response = await this.fetcher(url, { headers: { Accept: 'application/json', ...headers }, signal: AbortSignal.timeout(12000), redirect: 'error' });
+          response = await this.fetcher(url, { headers: { Accept: 'application/json', ...headers }, signal: AbortSignal.timeout(this.timeoutMs), redirect: 'error' });
         } catch {
           if (attempt === 2) throw new ProviderError(this.provider);
           await this.sleep(500 * 2 ** attempt);

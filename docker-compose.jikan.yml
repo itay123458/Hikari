@@ -1,0 +1,32 @@
+# Include after docker-compose.yml and docker-compose.pi.yml.
+services:
+  bot:
+    environment:
+      JIKAN_BASE_URL: ${JIKAN_BASE_URL:-http://jikan:8080/v4}
+    depends_on:
+      jikan:
+        condition: service_healthy
+  jikan:
+    build:
+      context: .
+      dockerfile: deploy/jikan/Dockerfile
+    image: hikari-jikan:local
+    restart: unless-stopped
+    mem_limit: 192m
+    cpus: 0.5
+    pids_limit: 32
+    read_only: true
+    volumes:
+      - jikan_cache:/var/cache/hikari-jikan
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    networks:
+      - titan-network
+    # No published ports, application secrets, MongoDB, or indexing workers.
+
+volumes:
+  jikan_cache:

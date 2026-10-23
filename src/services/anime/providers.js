@@ -8,8 +8,20 @@ function queryUrl(base, params) {
 }
 
 export class Jikan {
-  constructor(http = new CachedHttp({ provider: 'Jikan', interval: 1100 })) { this.http = http; }
-  get(path, params = {}, ttl = 3600000) { return this.http.get(queryUrl(`https://api.jikan.moe/v4/${path}`, params), { ttl }); }
+  constructor(http = new CachedHttp({ provider: 'Jikan', interval: 1100, timeoutMs: 35000 }), { baseUrl = process.env.JIKAN_BASE_URL || '' } = {}) {
+    this.http = http;
+    this.baseUrl = null;
+    if (baseUrl.trim()) {
+      let url;
+      try { url = new URL(baseUrl.trim()); } catch { throw new Error('JIKAN_BASE_URL must be an HTTP(S) v4 API base without credentials, a query or fragment.'); }
+      if (!['https:', 'http:'].includes(url.protocol) || !url.hostname || url.username || url.password || url.search || url.hash || !/\/v4\/?$/.test(url.pathname)) throw new Error('JIKAN_BASE_URL must be an HTTP(S) v4 API base without credentials, a query or fragment.');
+      this.baseUrl = url.href.replace(/\/$/, '');
+    }
+  }
+  async get(path, params = {}, ttl = 3600000) {
+    if (!this.baseUrl) throw new Error('Configure JIKAN_BASE_URL for a self-hosted v4 endpoint. The Jikan public API retired on October 1, 2026.');
+    return this.http.get(queryUrl(`${this.baseUrl}/${path}`, params), { ttl });
+  }
   search(kind, params) {
     if (!['anime', 'characters', 'people'].includes(kind)) throw new Error('Invalid search type.');
     return this.get(kind, { ...params, limit: 10, ...(kind === 'anime' ? { sfw: true } : {}) }, 300000);

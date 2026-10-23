@@ -61,7 +61,7 @@ test('streaming buttons reject deceptive domains and unknown availability remain
 
 test('Jikan sends real documented filters and keeps unknown scores null', async () => {
   let target;
-  const jikan = new Jikan({ get: async url => { target = new URL(url); return { data: [{ mal_id: 1, score: null }], pagination: { has_next_page: false } }; } });
+  const jikan = new Jikan({ get: async url => { target = new URL(url); return { data: [{ mal_id: 1, score: null }], pagination: { has_next_page: false } }; } }, { baseUrl: 'http://jikan:8080/v4' });
   const result = await jikan.search('anime', { q: 'Cowboy', genres: '1', status: 'complete', page: 2 });
   assert.equal(target.pathname, '/v4/anime');
   assert.equal(target.searchParams.get('sfw'), 'true');

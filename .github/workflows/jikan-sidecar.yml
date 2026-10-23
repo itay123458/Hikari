@@ -1,0 +1,28 @@
+name: Jikan sidecar checks
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+jobs:
+  bridge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the pinned Jikan parser sidecar
+        run: docker build -f deploy/jikan/Dockerfile -t hikari-jikan:test .
+      - name: Check PHP syntax and offline response contracts
+        run: |
+          docker run --rm --network none --entrypoint php hikari-jikan:test -l /app/bridge/router.php
+          docker run --rm --network none --entrypoint php hikari-jikan:test -l /app/bridge/bridge.php
+          docker run --rm --network none --entrypoint php hikari-jikan:test /app/bridge/test.php
+      - name: Check isolated HTTP health and rejected requests
+        run: |
+          docker run -d --network none --name hikari-jikan-check hikari-jikan:test
+          sleep 2
+          docker exec hikari-jikan-check php -r '$r=json_decode(file_get_contents("http://127.0.0.1:8080/healthz"),true); if (($r["status"]??null)!=="ok") exit(1);'
+          docker exec hikari-jikan-check php -r '$c=stream_context_create(["http"=>["ignore_errors"=>true]]); file_get_contents("http://127.0.0.1:8080/v4/anime?unsupported=1",false,$c); if (!str_contains($http_response_header[0],"400")) exit(1);'
+      - name: Stop the test sidecar
+        if: always()
+        run: docker rm -f hikari-jikan-check || true

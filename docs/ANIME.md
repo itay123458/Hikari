@@ -17,7 +17,12 @@ server settings remain administrator commands inside Discord.
    changes are additive and idempotent; existing rows are preserved. The shared
    schema also runs at startup. The existing version-1 ledger is retained for
    compatibility with deployments that pin `SCHEMA_VERSION=1`.
-3. Create an application in your AnimeSchedule account's API settings. Put its
+3. Configure `JIKAN_BASE_URL` for a private v4 metadata endpoint, or include
+   `docker-compose.jikan.yml` to run Hikari's private parser sidecar. The Jikan
+   public API retired October 1, 2026; it cannot be repaired with retries or a
+   different token. The sidecar uses the official parser/serializer, caches
+   bounded source data on disk, and needs no MAL account credentials.
+   Create an application in your AnimeSchedule account's API settings. Put its
    **application bearer token** in `ANIMESCHEDULE_TOKEN` in the environment. Do
    not send account passwords or API tokens through Discord. Jikan needs no key.
 4. Start the existing bot normally (`npm start` or the existing Docker Compose
@@ -224,6 +229,12 @@ private profile/notes are placed in provider caches. Replicas share job state
 and scanner leases; provider caches/limits are process-local, so size replica
 counts to respect the provider's IP/application quotas.
 
+The private metadata bridge caches successful source responses for 24 hours,
+with 500-entry/32 MiB bounds and no cached failures. Jikan HTTP requests allow
+35 seconds for cold parsing; AnimeSchedule retains its 12-second timeout.
+The bridge bounds a complete request to 25 seconds and rejects overly broad
+or deep searches rather than returning invented or incomplete pagination.
+
 The worker polls every 30 seconds and scans about every five minutes. Scanning
 runs separately from job delivery, with a renewable database lease. Jobs use
 `FOR UPDATE SKIP LOCKED`, renewable claims and stable notification keys across
@@ -320,6 +331,8 @@ backup and rollback image. Discord confirmed 29 registered commands including
 `admin weekly` and `admin preview`; readiness reported persistent PostgreSQL.
 The authenticated AnimeSchedule check returned 276 current entries across
 raw/sub/dub and an exact MAL-ID mapping. Other Pi containers retained their IDs.
-Live Jikan requests from the Pi timed out at the network layer (`ETIMEDOUT`),
-so live Jikan discovery/news verification is unavailable until connectivity
-recovers; its documented response handling is covered by regression tests.
+The initial Jikan timeout was traced to the public API's October 1 retirement
+([maintainer announcement](https://github.com/jikan-me/jikan-rest/issues/613)),
+not an AnimeSchedule token problem. The private parser bridge replaces that
+retired endpoint; its live checks cover search, detail, current news, videos,
+relations, credits, streaming listings, seasons and genres.

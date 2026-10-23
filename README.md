@@ -142,6 +142,7 @@ Fill `.env` privately. At minimum, configure:
 | `CLIENT_ID` | The same Discord application's ID |
 | `OWNER_IDS` | Comma-separated Discord IDs for bot owners |
 | `POSTGRES_URL` | The persistent PostgreSQL connection string |
+| `JIKAN_BASE_URL` | Your private Jikan-compatible v4 metadata endpoint; Compose overlay supplies it |
 | `ANIMESCHEDULE_TOKEN` | AnimeSchedule application bearer token for schedules |
 | `PORT` | Health/API listening port |
 
@@ -180,7 +181,21 @@ endpoints report service and persistent-database readiness.
 **Jikan v4** supplies MyAnimeList metadata and needs no API key.
 **AnimeSchedule** supplies release schedules and needs an application token.
 Provider availability and rate limits can affect features.
-Discovery and Jikan news continue working without the scheduling token. Jikan
+Jikan's shared public API [retired October 1, 2026](https://github.com/jikan-me/jikan-rest/issues/613).
+Hikari can run a private, lightweight service using the official Jikan parser
+and v4 serializer, with a persistent bounded cache and no indexing database:
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.pi.yml -f docker-compose.jikan.yml up -d --build
+```
+
+The service has no published ports and receives no Discord or AnimeSchedule
+credentials. The overlay sets `JIKAN_BASE_URL=http://jikan:8080/v4`; operators
+with an existing compatible private endpoint can set their own base URL instead.
+For a local Node process, configure an endpoint reachable from that process;
+Docker's `jikan` name resolves only inside the Compose network. See the
+[sidecar guide](deploy/jikan/README.md) for supported routes and resource limits.
+Discovery and Jikan news need a configured metadata endpoint but no scheduling token. Jikan
 articles remain unclassified because its news API does not supply reliable
 categories; trailer, relation, date and status filters use structured resources.
 
